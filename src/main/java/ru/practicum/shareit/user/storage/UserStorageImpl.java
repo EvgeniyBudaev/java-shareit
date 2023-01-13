@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.storage;
 
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.EmailException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
@@ -8,32 +9,22 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class UserStorageImpl implements UserStorage {
     private Long increment = 0L;
     private final Map<Long, User> users = new HashMap<>();
 
-    /**
-     * @param id
-     * @return
-     */
     @Override
     public User get(Long id) {
         validateId(id);
         return users.get(id);
     }
 
-    /**
-     * @return
-     */
     @Override
     public Collection<User> getAll() {
         return users.values();
     }
 
-    /**
-     * @param user
-     * @return
-     */
     @Override
     public User add(User user) {
         validateEmail(user);
@@ -42,10 +33,6 @@ public class UserStorageImpl implements UserStorage {
         return users.get(user.getId());
     }
 
-    /**
-     * @param user
-     * @return
-     */
     @Override
     public User patch(User user) {
         validateId(user.getId());
@@ -61,10 +48,6 @@ public class UserStorageImpl implements UserStorage {
         return users.get(patchedUser.getId());
     }
 
-    /**
-     * @param id
-     * @return
-     */
     @Override
     public Boolean delete(Long id) {
         users.remove(id);
