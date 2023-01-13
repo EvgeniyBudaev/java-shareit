@@ -11,7 +11,6 @@ import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.Collection;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,11 +42,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto patch(ItemDto itemDto, Long itemId, Long userId) throws NotFoundException {
         Item storedItem = itemStorage.get(itemId);
-        if (!Objects.equals(storedItem.getOwner(), userId)) {
-            throw new PermissionException("Владелец вещи не совпадает с пользователем " + userId + ". " +
-                    "Изменить вещь может только владелец!");
+        if (!storedItem.getOwner().equals(userId)) {
+            String errorMessage = String.format("Владелец вещи не совпадает с пользователем userId = %d." +
+                    " Изменить вещь может только владелец!", userId);
+            throw new PermissionException(errorMessage);
         } else {
-
             itemDto.setId(itemId);
             Item patchedItem = itemStorage.patch(ItemMapper.toItem(itemDto, userId));
             return ItemMapper.toItemDto(patchedItem);

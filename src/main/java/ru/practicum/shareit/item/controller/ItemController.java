@@ -9,14 +9,12 @@ import ru.practicum.shareit.item.service.ItemService;
 import javax.validation.Valid;
 import java.util.Collection;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
     private ItemService itemService;
+    private final String userIdHeader = "X-Sharer-User-Id";
 
     @Autowired
     public ItemController(ItemService itemService) {
@@ -29,25 +27,25 @@ public class ItemController {
     }
 
     @GetMapping
-    public Collection<ItemDto> getAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public Collection<ItemDto> getAll(@RequestHeader(userIdHeader) Long userId) {
         return itemService.getAllByUserId(userId);
     }
 
     @PostMapping
-    public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ItemDto addItem(@RequestHeader(userIdHeader) Long userId,
                            @Valid @RequestBody ItemDto itemDto) {
         return itemService.add(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto patchItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ItemDto patchItem(@RequestHeader(userIdHeader) Long userId,
                              @PathVariable Long itemId,
                              @Valid @RequestBody ItemDto itemDto) {
         return itemService.patch(itemDto, itemId, userId);
     }
 
     @GetMapping("/search")
-    public Collection<ItemDto> search(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public Collection<ItemDto> search(@RequestHeader(userIdHeader) Long userId,
                                       @RequestParam String text) {
         return itemService.search(text, userId);
     }
