@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.PermissionException;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.storage.UserStorage;
@@ -16,27 +16,28 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
+    private final ItemMapper itemMapper;
     private final ItemStorage itemStorage;
     private final UserStorage userStorage;
 
     @Override
     public ItemDto get(Long id) {
-        return ItemMapper.toItemDto(itemStorage.get(id));
+        return itemMapper.toItemDto(itemStorage.get(id));
     }
 
     @Override
     public Collection<ItemDto> getAllByUserId(Long userId) {
         return itemStorage.getAllByOwnerId(userId)
                 .stream()
-                .map(ItemMapper::toItemDto)
+                .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public ItemDto add(ItemDto itemDto, Long userId) {
         userStorage.get(userId);
-        Item newItem = itemStorage.add(ItemMapper.toItem(itemDto, userId));
-        return ItemMapper.toItemDto(newItem);
+        Item newItem = itemStorage.add(itemMapper.toItem(itemDto, userId));
+        return itemMapper.toItemDto(newItem);
     }
 
     @Override
@@ -48,8 +49,8 @@ public class ItemServiceImpl implements ItemService {
             throw new PermissionException(errorMessage);
         } else {
             itemDto.setId(itemId);
-            Item patchedItem = itemStorage.patch(ItemMapper.toItem(itemDto, userId));
-            return ItemMapper.toItemDto(patchedItem);
+            Item patchedItem = itemStorage.patch(itemMapper.toItem(itemDto, userId));
+            return itemMapper.toItemDto(patchedItem);
         }
     }
 
@@ -63,7 +64,7 @@ public class ItemServiceImpl implements ItemService {
     public Collection<ItemDto> search(String text, Long userId) {
         return itemStorage.search(text, userId)
                 .stream()
-                .map(ItemMapper::toItemDto)
+                .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 }
