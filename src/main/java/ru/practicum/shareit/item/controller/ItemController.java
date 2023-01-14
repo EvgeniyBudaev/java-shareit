@@ -1,52 +1,53 @@
 package ru.practicum.shareit.item.controller;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
-
 import javax.validation.Valid;
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
-    private ItemService itemService;
-    private final String userIdHeader = "X-Sharer-User-Id";
 
-    @Autowired
-    public ItemController(ItemService itemService) {
-        this.itemService = itemService;
-    }
+    private final ItemService itemService;
 
-    @GetMapping("/{itemId}")
-    public ItemDto getId(@PathVariable Long itemId) {
-        return itemService.get(itemId);
-    }
-
-    @GetMapping
-    public Collection<ItemDto> getAll(@RequestHeader(userIdHeader) Long userId) {
-        return itemService.getAllByUserId(userId);
-    }
-
-    @PostMapping
-    public ItemDto addItem(@RequestHeader(userIdHeader) Long userId,
-                           @Valid @RequestBody ItemDto itemDto) {
-        return itemService.add(itemDto, userId);
+    @PostMapping()
+    public ResponseEntity<ItemDto> createItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
+        ItemDto itemCreated = itemService.createItem(itemDto, userId);
+        return ResponseEntity.status(201).body(itemCreated);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto patchItem(@RequestHeader(userIdHeader) Long userId,
-                             @PathVariable Long itemId,
-                             @Valid @RequestBody ItemDto itemDto) {
-        return itemService.patch(itemDto, itemId, userId);
+    public ResponseEntity<ItemDto> updateItem(@RequestBody ItemDto itemDto, @PathVariable Long itemId,
+                              @RequestHeader("X-Sharer-User-Id") Long userId) {
+        ItemDto itemUpdated = itemService.updateItem(itemDto, itemId, userId);
+        return ResponseEntity.ok().body(itemUpdated);
     }
 
     @GetMapping("/search")
-    public Collection<ItemDto> search(@RequestHeader(userIdHeader) Long userId,
-                                      @RequestParam String text) {
-        return itemService.search(text, userId);
+    public ResponseEntity<List<ItemDto>> searchItems(@RequestParam(name = "text") String text) {
+        return ResponseEntity.ok().body(itemService.searchItemsByDescription(text));
+    }
+
+    @DeleteMapping("/{itemId}")
+    public ResponseEntity<Void> removeItem(@PathVariable Long itemId) {
+        itemService.removeItem(itemId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/{itemId}")
+    public ResponseEntity<ItemDto> getItem(@PathVariable Long itemId) {
+        ItemDto item = itemService.getItem(itemId);
+        return ResponseEntity.ok().body(item);
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<ItemDto>> findAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        List<ItemDto> items = itemService.getAllItemsByUserId(userId);
+        return ResponseEntity.ok().body(items);
     }
 }
