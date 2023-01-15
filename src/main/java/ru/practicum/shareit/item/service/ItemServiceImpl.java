@@ -45,7 +45,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto patch(ItemDto itemDto, Long itemId, Long userId) throws NotFoundException {
-        Item item = itemMapper.toItem(itemDto);
+        itemMapper.toItem(itemDto);
         Item storedItem = itemStorage.get(itemId);
         if (!storedItem.getOwner().equals(userId)) {
             String errorMessage = String.format("Владелец вещи не совпадает с пользователем userId = %d." +
