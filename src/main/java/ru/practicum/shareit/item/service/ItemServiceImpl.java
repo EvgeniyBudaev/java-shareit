@@ -43,12 +43,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto patch(ItemDto itemDto, Long itemId, Long userId) {
+    public ItemDto updateItem(ItemDto itemDto, long itemId, long userId) {
         Item item  = itemMapper.toItem(itemDto);
         userIdValidator(userId);
         Item oldItem = itemStorage.get(itemId);
         itemOwnerNameDescAvailValidator(item, oldItem, userId);
-        Item changedItem = itemStorage.patch(oldItem);
+        Item changedItem = itemStorage.updateItem(oldItem);
         return itemMapper.toItemDto(changedItem);
     }
 

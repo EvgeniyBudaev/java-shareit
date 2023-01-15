@@ -37,7 +37,7 @@ public interface ItemStorage {
      * @param item объект Вещи с изменениями
      * @return обновленный объект Item
      */
-    Item patch(Item item);
+    Item updateItem(Item item);
 
     /**
      * Реализует удаление Вещи из хранилища

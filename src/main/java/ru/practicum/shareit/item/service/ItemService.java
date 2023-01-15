@@ -35,7 +35,7 @@ public interface ItemService {
      * @param userId идентификатор Пользователя
      * @return DTO обновленного объекта Item
      */
-    ItemDto patch(ItemDto itemDto, Long itemId, Long userId);
+    ItemDto updateItem(ItemDto itemDto, long itemId, long userId);
 
     /**
      * Реализует удаление Вещи из хранилища

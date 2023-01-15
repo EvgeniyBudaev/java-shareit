@@ -28,7 +28,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ResponseEntity<ItemDto> updateItem(@RequestBody ItemDto itemDto, @PathVariable Long itemId,
                                               @RequestHeader(userIdHeader) Long userId) {
-        ItemDto itemUpdated = itemService.patch(itemDto, itemId, userId);
+        ItemDto itemUpdated = itemService.updateItem(itemDto, itemId, userId);
         return ResponseEntity.ok().body(itemUpdated);
     }
 

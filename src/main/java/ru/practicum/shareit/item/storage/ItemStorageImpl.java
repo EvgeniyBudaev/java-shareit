@@ -43,7 +43,7 @@ public class ItemStorageImpl implements ItemStorage {
     }
 
     @Override
-    public Item patch(Item item) {
+    public Item updateItem(Item item) {
         items.put(item.getId(), item);
         return items.get(item.getId());
     }
