@@ -9,5 +9,5 @@ public interface ItemMapper {
 
     ItemDto toItemDto(Item item);
 
-    Item toItem(ItemDto itemDto, Long id);
+    Item toItem(ItemDto itemDto);
 }

@@ -38,12 +38,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto add(ItemDto itemDto, Long userId) {
         userStorage.get(userId);
-        Item newItem = itemStorage.add(itemMapper.toItem(itemDto, userId));
+        Item newItem = itemStorage.add(itemMapper.toItem(itemDto));
         return itemMapper.toItemDto(newItem);
     }
 
     @Override
     public ItemDto patch(ItemDto itemDto, Long itemId, Long userId) throws NotFoundException {
+        Item item = itemMapper.toItem(itemDto);
         Item storedItem = itemStorage.get(itemId);
         if (!storedItem.getOwner().equals(userId)) {
             String errorMessage = String.format("Владелец вещи не совпадает с пользователем userId = %d." +
@@ -51,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
             throw new PermissionException(errorMessage);
         } else {
             itemDto.setId(itemId);
-            Item patchedItem = itemStorage.patch(itemMapper.toItem(itemDto, userId));
+            Item patchedItem = itemStorage.patch(item);
             return itemMapper.toItemDto(patchedItem);
         }
     }
