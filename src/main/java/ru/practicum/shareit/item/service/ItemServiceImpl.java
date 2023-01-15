@@ -37,9 +37,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto add(ItemDto itemDto, Long userId) {
+        Item newItem = itemMapper.toItem(itemDto);
         userStorage.get(userId);
-        Item newItem = itemStorage.add(itemMapper.toItem(itemDto));
-        return itemMapper.toItemDto(newItem);
+        Item createdItem = itemStorage.add(newItem);
+        return itemMapper.toItemDto(createdItem);
     }
 
     @Override
@@ -51,8 +52,7 @@ public class ItemServiceImpl implements ItemService {
                     " Изменить вещь может только владелец!", userId);
             throw new PermissionException(errorMessage);
         } else {
-            itemDto.setId(itemId);
-            Item patchedItem = itemStorage.patch(item);
+            Item patchedItem = itemStorage.patch(storedItem);
             return itemMapper.toItemDto(patchedItem);
         }
     }
