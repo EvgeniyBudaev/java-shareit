@@ -31,7 +31,7 @@ public class ItemStorageImpl implements ItemStorage {
     public Collection<Item> getAllByOwnerId(Long ownerId) {
         return items.values()
                 .stream()
-                .filter(item -> Objects.equals(item.getOwner(), ownerId))
+                .filter(item -> item.getOwner().getId() == ownerId)
                 .collect(Collectors.toList());
     }
 
