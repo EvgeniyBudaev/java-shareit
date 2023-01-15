@@ -21,7 +21,7 @@ public class ItemController {
 
     @PostMapping()
     public ResponseEntity<ItemDto> createItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader(userIdHeader) Long userId) {
-        ItemDto itemCreated = itemService.add(itemDto, userId);
+        ItemDto itemCreated = itemService.createItem(itemDto, userId);
         return ResponseEntity.status(201).body(itemCreated);
     }
 
@@ -34,24 +34,24 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<Collection<ItemDto>> searchItems(@RequestParam(name = "text") String text) {
-        return ResponseEntity.ok().body(itemService.search(text));
+        return ResponseEntity.ok().body(itemService.searchItemsByDescription(text));
     }
 
     @DeleteMapping("/{itemId}")
     public ResponseEntity<Void> removeItem(@PathVariable Long itemId) {
-        itemService.delete(itemId);
+        itemService.removeItem(itemId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/{itemId}")
     public ResponseEntity<ItemDto> getItem(@PathVariable Long itemId) {
-        ItemDto item = itemService.get(itemId);
+        ItemDto item = itemService.getItem(itemId);
         return ResponseEntity.ok().body(item);
     }
 
     @GetMapping()
     public ResponseEntity<List<ItemDto>> findAll(@RequestHeader(userIdHeader) Long userId) {
-        List<ItemDto> items = itemService.getAllByUserId(userId);
+        List<ItemDto> items = itemService.getAllItemsByUserId(userId);
         return ResponseEntity.ok().body(items);
     }
 }

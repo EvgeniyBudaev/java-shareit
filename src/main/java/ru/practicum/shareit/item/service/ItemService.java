@@ -11,14 +11,14 @@ public interface ItemService {
      * @param id идентификатор вещи
      * @return ItemDto
      */
-    ItemDto get(Long id);
+    ItemDto getItem(Long id);
 
     /**
      * Возвращает коллекцию DTO Вещей Пользователя
      * @param userId идентификатор Пользователя владельца Вещи
      * @return коллекцию ItemDto
      */
-    List<ItemDto> getAllByUserId(Long userId);
+    List<ItemDto> getAllItemsByUserId(Long userId);
 
     /**
      * Реализует добавление Вещи в хранилище
@@ -26,7 +26,7 @@ public interface ItemService {
      * @param ownerId идентификатор Пользователя владельца
      * @return DTO добавленного объекта Item в хранилище
      */
-    ItemDto add(ItemDto itemDto, Long ownerId);
+    ItemDto createItem(ItemDto itemDto, Long ownerId);
 
     /**
      * Реализует обновление полей хранимой Вещи
@@ -42,12 +42,12 @@ public interface ItemService {
      * @param id идентификатор удаляемой вещи
      * @return true в случае успешного удаления
      */
-    boolean delete(Long id);
+    void removeItem(Long id);
 
     /**
      * Реализует поиск Вещей в хранилище по ключевому слову
      * @param keyword ключевое слово для поиска
      * @return коллекцию DTO объектов Item
      */
-    Collection<ItemDto> search(String keyword);
+    Collection<ItemDto> searchItemsByDescription(String keyword);
 }

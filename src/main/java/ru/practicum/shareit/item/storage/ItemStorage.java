@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.storage;
 
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface ItemStorage {
     /**
@@ -10,27 +10,20 @@ public interface ItemStorage {
      * @param id идентфикатор Вещи
      * @return объект Item
      */
-    Item get(Long id);
+    Item getItem(Long id);
 
     /**
-     * Возвращает коллекцию DTO всех Вещей
-     * @return коллекцию ItemDto
+     * Возвращает коллекцию всех Вещей
+     * @return коллекцию объектов ItemDto
      */
-    Collection<Item> getAll();
-
-    /**
-     * Возвращает коллекцию Вещей Пользователя
-     * @param ownerId идентификатор Пользователя - владельца Вещи
-     * @return коллекцию объектов Item
-     */
-    Collection<Item> getAllByOwnerId(Long ownerId);
+    List<Item> getAllItems();
 
     /**
      * Реализует добавление Вещи в хранилище
      * @param item объект Вещи
      * @return добавленный объект Item в хранилище
      */
-    Item add(Item item);
+    Item createItem(Item item);
 
     /**
      * Реализует обновление полей хранимой Вещи
@@ -44,5 +37,5 @@ public interface ItemStorage {
      * @param id идентификатор удаляемой вещи
      * @return true в случае успешного удаления
      */
-    boolean delete(Long id);
+    void removeItem(Long id);
 }

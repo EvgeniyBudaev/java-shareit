@@ -2,17 +2,19 @@ package ru.practicum.shareit.user.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class User {
     private long id;
-    @NotEmpty
     private String name;
-    @NotEmpty
-    @Email
     private String email;
+
+    public User(User newUser) {
+        this.setId(newUser.getId());
+        this.setName(newUser.getName());
+        this.setEmail(newUser.getEmail());
+    }
 }
