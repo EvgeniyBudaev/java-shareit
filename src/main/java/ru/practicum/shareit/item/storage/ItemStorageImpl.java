@@ -37,15 +37,7 @@ public class ItemStorageImpl implements ItemStorage {
 
     @Override
     public Item add(Item item) {
-        if (item.getAvailable() == null) {
-            throw new NotValidException("поле Доступность не может быть пустым!");
-        }
-        if (item.getName() == null || item.getName().isEmpty()) {
-            throw new NotValidException("поле Название не может быть пустым!");
-        }
-        if (item.getDescription() == null || item.getDescription().isEmpty()) {
-            throw new NotValidException("поле Описание не может быть пустым!");
-        }
+
         item.setId(++increment);
         items.put(item.getId(), item);
         return items.get(item.getId());

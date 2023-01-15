@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.PermissionException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -44,16 +44,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto patch(ItemDto itemDto, Long itemId, Long userId) {
-        itemMapper.toItem(itemDto);
-        Item storedItem = itemStorage.get(itemId);
-        if (storedItem.getOwner().getId() != userId) {
-            String errorMessage = String.format("Владелец вещи не совпадает с пользователем userId = %d." +
-                    " Изменить вещь может только владелец!", userId);
-            throw new PermissionException(errorMessage);
-        } else {
-            Item patchedItem = itemStorage.patch(storedItem);
-            return itemMapper.toItemDto(patchedItem);
-        }
+        Item item  = itemMapper.toItem(itemDto);
+        userIdValidator(userId);
+        Item oldItem = itemStorage.get(itemId);
+        itemOwnerNameDescAvailValidator(item, oldItem, userId);
+        Item changedItem = itemStorage.patch(oldItem);
+        return itemMapper.toItemDto(changedItem);
     }
 
     @Override
@@ -72,5 +68,26 @@ public class ItemServiceImpl implements ItemService {
                 .filter(i -> i.getDescription().toLowerCase().contains(text.toLowerCase()) && i.getAvailable())
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
+    }
+
+    private void itemOwnerNameDescAvailValidator(Item item, Item oldItem, long userId) {
+        if (oldItem.getOwner().getId() != userId) {
+            throw new NotFoundException("User is not owner of this item!");
+        }
+        if (item.getName() != null) {
+            oldItem.setName(item.getName());
+        }
+        if (item.getDescription() != null) {
+            oldItem.setDescription(item.getDescription());
+        }
+        if (item.getAvailable() != null) {
+            oldItem.setAvailable(item.getAvailable());
+        }
+    }
+
+    private void userIdValidator(Long userId) {
+        if (!itemStorage.getAll().contains(itemStorage.get(userId))) {
+            throw new NotFoundException(String.format("user with id = %d not found.", userId));
+        }
     }
 }
