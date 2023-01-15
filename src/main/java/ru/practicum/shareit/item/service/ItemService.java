@@ -40,7 +40,6 @@ public interface ItemService {
     /**
      * Реализует удаление Вещи из хранилища
      * @param id идентификатор удаляемой вещи
-     * @return true в случае успешного удаления
      */
     void removeItem(Long id);
 
