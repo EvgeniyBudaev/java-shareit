@@ -53,22 +53,8 @@ public class ItemStorageImpl implements ItemStorage {
 
     @Override
     public Item patch(Item item) {
-        if (!items.containsKey(item.getId())) {
-            throw new NotFoundException("Вещь с идентификатором " +
-                    item.getId() + " не зарегистрирована!");
-        }
-        Item patchedItem = items.get(item.getId());
-        if (item.getName() != null && !item.getName().isEmpty()) {
-            patchedItem.setName(item.getName());
-        }
-        if (item.getDescription() != null && !item.getDescription().isEmpty()) {
-            patchedItem.setDescription(item.getDescription());
-        }
-        if (item.getAvailable() != null) {
-            patchedItem.setAvailable(item.getAvailable());
-        }
-        items.put(patchedItem.getId(), patchedItem);
-        return items.get(patchedItem.getId());
+        items.put(item.getId(), item);
+        return items.get(item.getId());
     }
 
     @Override

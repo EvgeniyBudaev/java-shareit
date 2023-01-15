@@ -44,7 +44,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto patch(ItemDto itemDto, Long itemId, Long userId) throws NotFoundException {
+    public ItemDto patch(ItemDto itemDto, Long itemId, Long userId) {
         itemMapper.toItem(itemDto);
         Item storedItem = itemStorage.get(itemId);
         if (storedItem.getOwner().getId() != userId) {
