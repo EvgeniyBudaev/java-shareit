@@ -1,52 +1,57 @@
 package ru.practicum.shareit.user.controller;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.Exception.NotFoundException;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.exception.DataExistException;
+import ru.practicum.shareit.logger.Logger;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
-import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
-
-@Slf4j
 @RestController
 @RequestMapping(path = "/users")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class UserController {
-
     private final UserService userService;
+    private final UserMapper userMapper;
 
-    @GetMapping("{id}")
-    public UserDto getUserById(@PathVariable long id) throws NotFoundException {
-        log.info("getUserById {}", id);
-        return userService.get(id);
+    @PostMapping
+    public UserDto addUser(@Valid @RequestBody UserDto userDto) throws DataExistException {
+        Logger.logRequest(HttpMethod.POST, "/users", userDto.toString());
+        User user = userMapper.convertFromDto(userDto);
+        return userMapper.convertToDto(userService.addUser(user));
+    }
+
+    @GetMapping("{userId}")
+    public UserDto getUserById(@PathVariable long userId) {
+        Logger.logRequest(HttpMethod.GET, "/users/" + userId, "пусто");
+        return userMapper.convertToDto(userService.getUserById(userId));
     }
 
     @GetMapping
-    public Collection<UserDto> getAllUsers() {
-        log.info("getAllUsers");
-        return userService.getAll();
+    public List<UserDto> getAllUsers() throws DataExistException {
+        Logger.logRequest(HttpMethod.GET, "/users", "пусто");
+        return userService.getAllUsers().stream()
+                .map(userMapper::convertToDto)
+                .collect(Collectors.toList());
     }
 
-    @PostMapping
-    public UserDto create(@Valid @RequestBody UserDto userDto) {
-        log.info("create");
-        return userService.add(userDto);
+    @PatchMapping("{userId}")
+    public UserDto updateUser(@PathVariable long userId, @RequestBody UserDto userDto) throws DataExistException {
+        Logger.logRequest(HttpMethod.PATCH, "/users/" + userId, userDto.toString());
+        User user = userMapper.convertFromDto(userDto);
+        return userMapper.convertToDto(userService.updateUser(userId, user));
     }
 
-    @PatchMapping("/{userId}")
-    public UserDto update(@RequestBody UserDto userDto,
-                          @PathVariable Long userId) throws NotFoundException {
-        log.info("update userId {}", userId);
-        return userService.patch(userDto, userId);
+    @DeleteMapping("{userId}")
+    public void removeUser(@PathVariable long userId) {
+        Logger.logRequest(HttpMethod.DELETE, "/users/" + userId, "пусто");
+        userService.removeUser(userId);
     }
-
-    @DeleteMapping("{id}")
-    public void delete(@PathVariable long id) {
-        userService.delete(id);
-    }
-
 }

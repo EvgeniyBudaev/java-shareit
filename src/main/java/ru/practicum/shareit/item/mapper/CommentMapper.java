@@ -1,16 +1,23 @@
 package ru.practicum.shareit.item.mapper;
 
-import org.mapstruct.Mapper;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.CommentToInputDto;
 import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
 
-@Mapper(componentModel = "spring")
-public interface CommentMapper {
+@Component
+public class CommentMapper {
+    private final ModelMapper modelMapper;
 
-    CommentDto toCommentDto(Comment comment);
+    public CommentMapper() {
+        modelMapper = new ModelMapper();
+    }
 
-    Comment toComment(CommentToInputDto commentToInputDto, User author, Item item);
+    public CommentDto convertToDto(Comment comment) {
+        return modelMapper.map(comment, CommentDto.class);
+    }
+
+    public Comment convertFromDto(CommentDto commentDto) {
+        return modelMapper.map(commentDto, Comment.class);
+    }
 }

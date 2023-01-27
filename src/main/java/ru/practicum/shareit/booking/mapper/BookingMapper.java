@@ -1,20 +1,29 @@
 package ru.practicum.shareit.booking.mapper;
 
-import org.mapstruct.Mapper;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingNestedDto;
-import ru.practicum.shareit.booking.dto.BookingToInputDto;
+import ru.practicum.shareit.booking.dto.BookingDtoShort;
+import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.mapper.ItemMapper;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.model.User;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class, ItemMapper.class})
-public interface BookingMapper {
-    Booking toBooking(BookingToInputDto bookingToInputDto, User booker, Item item);
+@Component
+public class BookingMapper {
+    private final ModelMapper modelMapper;
 
-    BookingDto toBookingDto(Booking booking);
+    BookingMapper() {
+        modelMapper = new ModelMapper();
+    }
 
-    BookingNestedDto toBookingNestedDto(Booking booking);
+    public BookingDto convertToDto(Booking booking) {
+        return modelMapper.map(booking, BookingDto.class);
+    }
+
+    public BookingDtoShort convertToDtoShort(Booking booking) {
+        return modelMapper.map(booking, BookingDtoShort.class);
+    }
+
+    public Booking convertFromDto(BookingInputDto bookingInputDto) {
+        return modelMapper.map(bookingInputDto, Booking.class);
+    }
 }
