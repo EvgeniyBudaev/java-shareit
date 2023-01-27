@@ -54,6 +54,7 @@ public class Item {
         this.setOwner(newItem.getOwner());
         this.setRequestId(newItem.getRequestId());
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
