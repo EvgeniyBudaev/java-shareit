@@ -1,70 +1,53 @@
 package ru.practicum.shareit.item.model;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.Hibernate;
 import ru.practicum.shareit.user.model.User;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Objects;
 
-@Entity
-@Table(name = "items")
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
+@Table(name = "items")
 public class Item {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private Long id;
+   @Column(name = "name", nullable = false)
+   private String name;
+   @Column(name = "description", nullable = false)
+   private String description;
+   @Column(name = "is_available", nullable = false)
+   private Boolean available;
+   @ManyToOne
+   @JoinColumn(name = "owner_id", referencedColumnName = "id")
+   private User owner;
+   @Column(name = "request_id")
+   private Long requestId;
 
-    @Column(name = "description", nullable = false)
-    private String description;
+   public Item(Item newItem) {
+      this.setId(newItem.getId());
+      this.setName(newItem.getName());
+      this.setDescription(newItem.getDescription());
+      this.setAvailable(newItem.getAvailable());
+      this.setOwner(newItem.getOwner());
+      this.setRequestId(newItem.getRequestId());
+   }
 
-    @Column(name = "is_available", nullable = false)
-    private Boolean available;
+   @Override
+   public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+      Item item = (Item) o;
+      return id != null && Objects.equals(id, item.id);
+   }
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id", referencedColumnName = "id")
-    private User owner;
-
-    @Column(name = "request_id")
-    private Long requestId;
-
-    public Item(Item newItem) {
-        this.setId(newItem.getId());
-        this.setName(newItem.getName());
-        this.setDescription(newItem.getDescription());
-        this.setAvailable(newItem.getAvailable());
-        this.setOwner(newItem.getOwner());
-        this.setRequestId(newItem.getRequestId());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Item item = (Item) o;
-        return id != null && Objects.equals(id, item.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+   @Override
+   public int hashCode() {
+      return getClass().hashCode();
+   }
 }
