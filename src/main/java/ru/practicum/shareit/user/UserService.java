@@ -1,67 +1,19 @@
 package ru.practicum.shareit.user;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exceptions.NotFoundValidationException;
+
+import ru.practicum.shareit.Exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
-import java.util.List;
 
-@Service
-@Slf4j
-@RequiredArgsConstructor
-public class UserService {
+import java.util.Collection;
 
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
+public interface UserService {
 
-    @Transactional
-    public UserDto createUser(UserDto userDto) {
-        log.info("User with id: " + userDto.getId() + " created");
-        return userMapper.toUserDto(userRepository.save(userMapper.toUser(userDto)));
-    }
+    UserDto get(long id) throws NotFoundException;
 
-    @Transactional
-    public UserDto updateUser(Long id, UserDto userDto) {
-        User oldUser = userRepository.findById(id).orElseThrow(() ->
-                new NotFoundValidationException("User with id: " + userDto.getId() + " not found."));
-        User updatedUser = userNameAndEmailUpdate(oldUser, userDto);
-        log.info("User with id: " + userDto.getId() + " updated");
-        return userMapper.toUserDto(updatedUser);
-    }
+    Collection<UserDto> getAll();
 
-    @Transactional(readOnly = true)
-    public List<UserDto> getAllUsers() {
-        return userMapper.toDtoList(userRepository.findAll());
-    }
+    UserDto add(UserDto userDto);
 
-    @Transactional(readOnly = true)
-    public UserDto getUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() ->
-                new NotFoundValidationException("User with id: " + id + "not found"));
-        return userMapper.toUserDto(user);
-    }
+    UserDto patch(UserDto userDto, long id) throws NotFoundException;
 
-    @Transactional
-    public void removeUser(Long id) {
-        userRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundValidationException("User with id: " + id + "not found"));
-        userRepository.deleteById(id);
-    }
-
-    private User userNameAndEmailUpdate(User oldUser, UserDto user) {
-        if (user.getEmail() != null) {
-            if (!user.getEmail().isBlank()) {
-                oldUser.setEmail(user.getEmail());
-            }
-        }
-        if (user.getName() != null) {
-            if (!user.getName().isBlank()) {
-                oldUser.setName(user.getName());
-            }
-        }
-        return oldUser;
-    }
+    void delete(long id);
 }

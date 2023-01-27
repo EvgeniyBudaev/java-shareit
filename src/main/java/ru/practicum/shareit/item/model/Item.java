@@ -1,53 +1,34 @@
 package ru.practicum.shareit.item.model;
-import lombok.*;
-import org.hibernate.Hibernate;
-import ru.practicum.shareit.user.model.User;
-import javax.persistence.*;
-import java.util.Objects;
 
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import ru.practicum.shareit.user.model.User;
+
+import javax.persistence.*;
+
 @Entity
 @Table(name = "items")
+@ToString
+@Data
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class Item {
+    @Id
+    @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "Name")
+    private String name;
+    @Column(name = "Description")
+    private String description;
+    @Column(name = "Isavailable")
+    private Boolean available;
+    @ManyToOne
+    @JoinColumn(name = "ownerid")
+    private User owner;
+    @Column(name = "RequestID")
+    private Long request;
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long id;
-   @Column(name = "name", nullable = false)
-   private String name;
-   @Column(name = "description", nullable = false)
-   private String description;
-   @Column(name = "is_available", nullable = false)
-   private Boolean available;
-   @ManyToOne
-   @JoinColumn(name = "owner_id", referencedColumnName = "id")
-   private User owner;
-   @Column(name = "request_id")
-   private Long requestId;
-
-   public Item(Item newItem) {
-      this.setId(newItem.getId());
-      this.setName(newItem.getName());
-      this.setDescription(newItem.getDescription());
-      this.setAvailable(newItem.getAvailable());
-      this.setOwner(newItem.getOwner());
-      this.setRequestId(newItem.getRequestId());
-   }
-
-   @Override
-   public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-      Item item = (Item) o;
-      return id != null && Objects.equals(id, item.id);
-   }
-
-   @Override
-   public int hashCode() {
-      return getClass().hashCode();
-   }
 }

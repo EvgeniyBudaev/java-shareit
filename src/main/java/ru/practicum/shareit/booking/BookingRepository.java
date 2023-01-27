@@ -1,39 +1,66 @@
 package ru.practicum.shareit.booking;
-import org.springframework.data.domain.Pageable;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import ru.practicum.shareit.Exception.NotFoundException;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.booking.model.BookingStatus;
+
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.Collection;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    List<Booking> findByBookerId(Long bookerId, Pageable pageable);
+    default Booking get(long id) {
+        return findById(id).orElseThrow(() -> new NotFoundException("Бронирование с идентификатором #" + id
+                + " не зарегистрировано!"));
+    }
 
-    List<Booking> findByBookerIdAndStartIsBeforeAndEndIsAfter(Long bookerId,
-                                                              LocalDateTime start, LocalDateTime end, Pageable pageable);
+    @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1 ORDER BY b.start DESC")
+    Collection<Booking> getAll(long bookerId);
 
-    List<Booking> findByBookerIdAndEndIsBefore(Long bookerId, LocalDateTime end, Pageable pageable);
+    @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1 AND b.status = ?2 ORDER BY b.start DESC")
+    Collection<Booking> getAllByStatus(long bookerId, BookingStatus status);
 
-    List<Booking> findByBookerIdAndStartIsAfter(Long bookerId, LocalDateTime start, Pageable pageable);
+    @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1 AND b.start <= ?2 AND b.end >= ?2 ORDER BY b.start DESC")
+    Collection<Booking> getAllCurrent(long bookerId, LocalDateTime now);
 
-    List<Booking> findByBookerIdAndStatusEquals(Long bookerId, Status status, Pageable pageable);
+    @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1 AND b.end < ?2 ORDER BY b.start DESC")
+    Collection<Booking> getAllPast(long bookerId, LocalDateTime now);
 
-    List<Booking> findByItemIdIn(List<Long> items, Pageable pageable);
+    @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1 AND b.start > ?2 ORDER BY b.start DESC")
+    Collection<Booking> getAllFuture(long bookerId, LocalDateTime now);
 
-    List<Booking> findByItemIdInAndStartIsBeforeAndEndIsAfter(List<Long> items,
-                                                              LocalDateTime start, LocalDateTime end, Pageable pageable);
 
-    List<Booking> findByItemIdInAndEndIsBefore(List<Long> items, LocalDateTime end, Pageable pageable);
+    @Query("SELECT b FROM Booking b WHERE b.item.owner.id = ?1 ORDER BY b.start DESC")
+    Collection<Booking> getAllForOwner(long bookerId);
 
-    List<Booking> findByItemIdInAndStartIsAfter(List<Long> items, LocalDateTime start, Pageable pageable);
+    @Query("SELECT b FROM Booking b WHERE b.item.owner.id = ?1 AND b.status = ?2 ORDER BY b.start DESC")
+    Collection<Booking> getAllByStatusForOwner(long bookerId, BookingStatus status);
 
-    List<Booking> findByItemIdInAndStatusEquals(List<Long> items, Status status, Pageable pageable);
+    @Query("SELECT b FROM Booking b WHERE b.item.owner.id = ?1 AND b.start <= ?2 AND b.end >= ?2 ORDER BY b.start DESC")
+    Collection<Booking> getAllCurrentForOwner(long bookerId, LocalDateTime now);
 
-    Optional<Booking> findByItemIdAndEndIsBefore(Long itemId, LocalDateTime end);
+    @Query("SELECT b FROM Booking b WHERE b.item.owner.id = ?1 AND b.end < ?2 ORDER BY b.start DESC")
+    Collection<Booking> getAllPastForOwner(long bookerId, LocalDateTime now);
 
-    Optional<Booking> findByItemIdAndStartIsAfter(Long itemId, LocalDateTime start);
+    @Query("SELECT b FROM Booking b WHERE b.item.owner.id = ?1 AND b.start > ?2 ORDER BY b.start DESC")
+    Collection<Booking> getAllFutureForOwner(long bookerId, LocalDateTime now);
 
-    List<Booking> findAllByBookerIdAndItemIdAndEndIsBefore(Long bookerId, Long itemId, LocalDateTime end);
+
+    @Query("SELECT b FROM Booking b WHERE b.item.id = ?1 AND b.end < ?2 ORDER BY b.end DESC")
+    Booking getLastForItem(long itemId, LocalDateTime now);
+
+    @Query("SELECT b FROM Booking b WHERE b.item.id = ?1 AND b.start > ?2 ORDER BY b.start ASC")
+    Booking getNextForItem(long itemId, LocalDateTime now);
+
+
+    @Query(
+            "SELECT COUNT (b) FROM Booking b " +
+                    "WHERE b.booker.id = ?1 " +
+                    "AND b.item.id = ?2 " +
+                    "AND b.end < ?3 " +
+                    "AND b.status = ru.practicum.shareit.booking.model.BookingStatus.APPROVED"
+    )
+    Integer getFinishedCount(long userId, long itemId, LocalDateTime now);
 }

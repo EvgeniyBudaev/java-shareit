@@ -1,18 +1,26 @@
 package ru.practicum.shareit.item;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import ru.practicum.shareit.Exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
-import java.util.List;
+
+import java.util.Collection;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    List<Item> findByOwnerId(Long ownerId);
+    default Item get(long id) {
+        return findById(id).orElseThrow(() -> new NotFoundException("Вещь с идентификатором #" + id
+                + " не зарегистрирована!"));
+    }
 
     @Query(" select i from Item i " +
             "where (upper(i.name) like upper(concat('%', ?1, '%')) " +
             " or upper(i.description) like upper(concat('%', ?1, '%')))" +
-            "and (i.available) is true")
-    Page<Item> search(String text, Pageable pageable);
+            " and i.available = true")
+    Collection<Item> search(String text);
+
+    Collection<Item> findAllByOwner_IdOrderByIdAsc(Long userId);
+
+    Item findByIdOrderByIdDesc(long itemId) throws NotFoundException;
 }

@@ -1,176 +1,77 @@
 package ru.practicum.shareit.booking;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingRequest;
-import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.RequestStatus;
-import ru.practicum.shareit.booking.model.Status;
-import ru.practicum.shareit.exceptions.IllegalRequestException;
-import ru.practicum.shareit.exceptions.NotFoundValidationException;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.ItemRepository;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.UserRepository;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import ru.practicum.shareit.booking.dto.BookingNestedDto;
+import ru.practicum.shareit.booking.dto.BookingToInputDto;
 
-@Slf4j
-@Service
-@RequiredArgsConstructor
-public class BookingService {
+import java.util.Collection;
 
-    private final BookingRepository bookingRepository;
-    private final BookingMapper bookingMapper;
-    private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
+public interface BookingService {
 
-    @Transactional
-    public BookingDto create(BookingRequest request, Long requesterId) {
-        Item item = itemRepository.findById(request.getItemId()).orElseThrow(() ->
-                new NotFoundValidationException("The item is not available for booking by owner."));
-        if (item.getOwner().getId().equals(requesterId))
-            throw new NotFoundValidationException("Booking your item? Why?");
-        if (item.getAvailable().equals(Boolean.FALSE))
-            throw new IllegalRequestException("This item not available.");
-        if (!request.getStart().isBefore(request.getEnd()))
-            throw new IllegalRequestException("Booking start is after the end.");
-        Booking booking = bookingMapper.toBookingFromRequest(request);
-        booking.setItem(item);
-        User requester = userRepository.findById(requesterId).orElseThrow(() ->
-                new NotFoundValidationException("Requester with id: " + requesterId + " not found."));
-        booking.setBooker(requester);
-        booking.setStatus(Status.WAITING);
-        log.info("Booking created: {}", booking);
-        return bookingMapper.toBookingDto(bookingRepository.save(booking));
-    }
+    /**
+     * Реализует получение Бронирования из хранилища по идентификатору
+     * Может быть выполнено либо автором бронирования, либо владельцем вещи, к которой относится бронирование.
+     * @param userId идентификатор пользователя
+     * @param bookingId идентификатор Бронирования
+     * @return коллекцию DTO объектов Booking
+     */
+    BookingDto get(long userId, long bookingId);
 
-    @Transactional
-    public BookingDto changeStatusByOwner(Long bookingId, Boolean approved, Long ownerId) {
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
-                new NotFoundValidationException("Booking with id: " + bookingId + " not found."));
-        User owner = booking.getItem().getOwner();
-        if (!owner.getId().equals(ownerId))
-            throw new NotFoundValidationException("This is not user's item.");
-        if (booking.getStatus().equals(Status.APPROVED))
-            throw new IllegalRequestException("Booking already approved");
-        if (approved.equals(Boolean.TRUE)) {
-            log.info("Approve booking id:{}", bookingId);
-            booking.setStatus(Status.APPROVED);
-        } else {
-            log.info("Reject booking id:{}", bookingId);
-            booking.setStatus(Status.REJECTED);
-        }
-        return bookingMapper.toBookingDto(booking);
-    }
+    /**
+     * Реализует получение последнего Бронирования из хранилища по идентификатору Вещи
+     * @param itemId идентификатор Вещи
+     * @return объект Booking
+     */
+    BookingNestedDto getLastForItem(long itemId);
 
-    @Transactional(readOnly = true)
-    public BookingDto getById(Long bookingId, Long userId) {
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
-                new NotFoundValidationException("Booking with id: " + bookingId + " not found."));
-        if (!booking.getBooker().getId().equals(userId)
-                && !booking.getItem().getOwner().getId().equals(userId)) {
-            throw new NotFoundValidationException("This is not user's booking or item.");
-        }
-        return bookingMapper.toBookingDto(booking);
-    }
+    /**
+     * Реализует получение предстоящего Бронирования из хранилища по идентификатору Вещи
+     * @param itemId идентификатор Вещи
+     * @return объект Booking
+     */
+    BookingNestedDto getNextForItem(long itemId);
 
-    @Transactional(readOnly = true)
-    public List<BookingDto> getAllByUser(String state, Long userId, Integer from, Integer size) {
-        if (userRepository.findById(userId).isEmpty())
-            throw new NotFoundValidationException("Requester with id: " + userId + " not found");
-        RequestStatus requestStatus = RequestStatus.parseState(state);
-        Pageable page = PageRequest.of(from / size, size, Sort.by("start").descending());
-        switch (requestStatus) {
-            case ALL:
-                if (bookingRepository.findByBookerId(userId, page).isEmpty()) {
-                    return new ArrayList<>();
-                } else {
-                    return bookingMapper.toBookingDtoList(bookingRepository.findByBookerId(userId, page));
-                }
-            case CURRENT:
-                LocalDateTime moment = LocalDateTime.now();
-                if (bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfter(userId,
-                        moment, moment, page).isEmpty()) {
-                    return new ArrayList<>();
-                } else {
-                    return bookingMapper.toBookingDtoList(bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfter(userId,
-                            moment, moment, page));
-                }
-            case PAST:
-                if  (bookingRepository.findByBookerIdAndEndIsBefore(
-                        userId, LocalDateTime.now(), page).isEmpty()) {
-                    return new ArrayList<>();
-                } else {
-                    return bookingMapper.toBookingDtoList(bookingRepository.findByBookerIdAndEndIsBefore(
-                            userId, LocalDateTime.now(), page));
-                }
-            case FUTURE:
-                if (bookingRepository.findByBookerIdAndStartIsAfter(
-                        userId, LocalDateTime.now(), page).isEmpty()) {
-                    return new ArrayList<>();
-                } else {
-                    return bookingMapper.toBookingDtoList(bookingRepository.findByBookerIdAndStartIsAfter(
-                            userId, LocalDateTime.now(), page));
-                }
-            case WAITING:
-                if (bookingRepository.findByBookerIdAndStatusEquals(userId,
-                        Status.WAITING, page).isEmpty()) {
-                    return new ArrayList<>();
-                } else {
-                    return bookingMapper.toBookingDtoList(bookingRepository.findByBookerIdAndStatusEquals(userId,
-                            Status.WAITING, page));
-                }
-            case REJECTED:
-                if (bookingRepository.findByBookerIdAndStatusEquals(userId,
-                        Status.REJECTED, page).isEmpty()) {
-                    return new ArrayList<>();
-                } else {
-                    return bookingMapper.toBookingDtoList(bookingRepository.findByBookerIdAndStatusEquals(userId,
-                            Status.REJECTED, page));
-                }
-            default:
-                throw new IllegalRequestException("Status is wrong");
-        }
-    }
+    /**
+     * Реализует получение списка Бронирований из хранилища текущего пользователя
+     * @param userId идентификатор пользователя
+     * @param keyWord ключевое слово для вывода списка бронирований
+     *
+     * @return коллекцию DTO объектов Booking
+     */
+    Collection<BookingDto> getCreated(long userId, String keyWord);
 
-    @Transactional(readOnly = true)
-    public List<BookingDto> getAllByUserOwner(String state, Long userId, Integer from, Integer size) {
-        userRepository
-                .findById(userId)
-                .orElseThrow(() -> new NotFoundValidationException("Requester with id: " + userId + " not found"));
-        RequestStatus requestStatus = RequestStatus.parseState(state);
-        List<Item> userItems = itemRepository.findByOwnerId(userId);
-        List<Long> userItemsIds = userItems.stream().map(Item::getId).collect(Collectors.toList());
-        Pageable page = PageRequest.of(from / size, size, Sort.by("start").descending());
-        switch (requestStatus) {
-            case ALL:
-                return bookingMapper.toBookingDtoList(bookingRepository.findByItemIdIn(userItemsIds, page));
-            case CURRENT:
-                LocalDateTime moment = LocalDateTime.now();
-                return bookingMapper.toBookingDtoList(bookingRepository.findByItemIdInAndStartIsBeforeAndEndIsAfter(
-                        userItemsIds, moment, moment, page));
-            case PAST:
-                return bookingMapper.toBookingDtoList(bookingRepository.findByItemIdInAndEndIsBefore(
-                        userItemsIds, LocalDateTime.now(), page));
-            case FUTURE:
-                return bookingMapper.toBookingDtoList(bookingRepository.findByItemIdInAndStartIsAfter(
-                        userItemsIds, LocalDateTime.now(), page));
-            case WAITING:
-                return bookingMapper.toBookingDtoList(bookingRepository.findByItemIdInAndStatusEquals(
-                        userItemsIds, Status.WAITING, page));
-            case REJECTED:
-                return bookingMapper.toBookingDtoList(bookingRepository.findByItemIdInAndStatusEquals(
-                        userItemsIds, Status.REJECTED, page));
-            default:
-                throw new NotFoundValidationException("Status is wrong");
-        }
-    }
+    /**
+     * Реализует получение списка бронирований для всех вещей текущего пользователя
+     * @param ownerId идентификатор пользователя Владельца Вещи
+     * @param keyWord ключевое слово для вывода списка бронирований
+     * @return коллекцию DTO объектов Booking
+     */
+    Collection<BookingDto> getForOwnedItems(long ownerId, String keyWord);
+
+    /**
+     * Реализует получение количества завершенных бронирований Вещи, выполненных текущим Пользователем
+     * @param itemId идентификатор Вещи
+     * @param userId идентификатор Пользователя
+     * @return коллекцию DTO объектов Booking
+     */
+    int getFinishedCount(long userId, long itemId);
+
+    /**
+     * Реализует создание Бронирования
+     * @param userId идентификатор пользователя
+     * @param bookingToInputDto DTO объекта Бронирования
+     * @return DTO объект Booking
+     */
+    BookingDto create(long userId, BookingToInputDto bookingToInputDto);
+
+    /**
+     * Реализует подтверждение Бронирования Владельцем Вещи
+     * @param ownerId идентификатор пользователя Владельца Вещи
+     * @param id идентификатор Бронирования
+     * @param approved отметка о подтверждении Бронирования:
+     *                 TRUE - Бронирование подтверждено
+     *                 FALSE - Бронирование отклонено
+     * @return DTO объект Booking
+     */
+    BookingDto setApproved(long ownerId, long id, boolean approved);
 }

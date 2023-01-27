@@ -1,65 +1,77 @@
 package ru.practicum.shareit.item;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.Exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.CommentToInputDto;
+import ru.practicum.shareit.item.dto.ItemToInputDto;
+import ru.practicum.shareit.item.dto.ItemAllFieldsDto;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
-import java.util.List;
+import java.util.Collection;
 
+@Slf4j
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
 
-    private final ItemService itemService;
+    private ItemService itemService;
 
-    @PostMapping()
-    public ResponseEntity<ItemDto> createItem(@Valid @RequestBody ItemDto itemDto,
-                                              @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return ResponseEntity.status(201).body(itemService.createItem(itemDto, userId));
-    }
+    @Autowired
+    public ItemController(ItemService itemService) {
 
-    @PatchMapping("/{itemId}")
-    public ResponseEntity<ItemDto> updateItem(@RequestBody ItemDto itemDto, @PathVariable Long itemId,
-                              @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return ResponseEntity.ok().body(itemService.updateItem(itemDto, itemId, userId));
-    }
-
-    @GetMapping("/search")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<ItemDto>> search(@RequestParam("text") String text,
-                                @RequestParam(value = "from", defaultValue = "0") @PositiveOrZero Integer from,
-                                @RequestParam(value = "size", defaultValue = "20") @Positive Integer size) {
-        return ResponseEntity.ok().body(itemService.search(text, from, size));
-    }
-
-    @DeleteMapping("/{itemId}")
-    public ResponseEntity<Void> removeItem(@PathVariable Long itemId) {
-        itemService.removeItem(itemId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        this.itemService = itemService;
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> getItem(@PathVariable Long itemId,
-                                           @RequestHeader("X-Sharer-User-Id") Long requesterId) {
-        return ResponseEntity.ok().body(itemService.getItem(itemId, requesterId));
+    public ItemAllFieldsDto getId(@RequestHeader("X-Sharer-User-Id") long userId,
+                                  @PathVariable long itemId) throws NotFoundException {
+        log.info("ITEM получен запрос GET " + itemId);
+        return itemService.get(itemId, userId);
     }
 
-    @GetMapping()
-    public ResponseEntity<List<ItemDto>> findAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return ResponseEntity.ok().body(itemService.getAllItemsByUserId(userId));
+    @GetMapping
+    public Collection<ItemAllFieldsDto> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
+        log.info("ITEM получен запрос GET ALL");
+        return itemService.getAllByUserId(userId);
+    }
+
+    @PostMapping
+    public ItemAllFieldsDto addItem(@RequestHeader("X-Sharer-User-Id") long userId,
+                                    @Valid @RequestBody ItemAllFieldsDto itemAllFieldsDto) throws NotFoundException {
+        log.info("ITEM получен запрос POST userId =" + userId + "тело запроса: " + itemAllFieldsDto);
+        return itemService.add(itemAllFieldsDto, userId);
     }
 
     @PostMapping("/{itemId}/comment")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<CommentDto> createComment(@PathVariable Long itemId,
-                                    @RequestBody @Valid CommentDto commentDto,
-                                    @RequestHeader("X-Sharer-User-Id") Long authorId) {
-        return ResponseEntity.ok().body(itemService.createComment(itemId, commentDto, authorId));
+    public CommentDto addComment(
+            @RequestHeader("X-Sharer-User-Id") long userId,
+            @PathVariable long itemId,
+            @Valid @RequestBody CommentToInputDto commentToInputDto
+    ) {
+        log.info("ITEM COMMENT получен запрос POST userId = " + userId
+                + " itemId = " + itemId + " тело запроса: " + commentToInputDto);
+        return itemService.addComment(userId, itemId, commentToInputDto);
     }
+
+    @PatchMapping("/{itemId}")
+    public ItemAllFieldsDto patchItem(@RequestHeader("X-Sharer-User-Id") long userId,
+                                      @PathVariable long itemId,
+                                      @Valid @RequestBody ItemToInputDto itemToInputDto) throws NotFoundException {
+        log.info("ITEM получен запрос PATCH userId = " + userId
+                + " itemId = " + itemId + " тело запроса " + itemToInputDto);
+        return itemService.patch(itemToInputDto, itemId, userId);
+    }
+
+    @GetMapping("/search")
+    public Collection<ItemAllFieldsDto> search(@RequestHeader("X-Sharer-User-Id") long userId,
+                                               @RequestParam String text) {
+        log.info("ITEM получен запрос GET userId = " + userId + " search = " + text);
+        return itemService.search(text, userId);
+    }
+
 }
