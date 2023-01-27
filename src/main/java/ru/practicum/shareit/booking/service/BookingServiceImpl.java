@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,12 +7,14 @@ import ru.practicum.shareit.Exception.NotAvailableException;
 import ru.practicum.shareit.Exception.NotFoundException;
 import ru.practicum.shareit.Exception.NotValidException;
 import ru.practicum.shareit.booking.dto.*;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserService;
-import ru.practicum.shareit.user.dto.UserMapper;
+import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -24,16 +26,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
+    private final BookingMapper bookingMapper;
     private final BookingRepository bookingRepository;
+    private final UserMapper userMapper;
     private final UserService userService;
     private final ItemRepository itemRepository;
 
     @Override
     public BookingDto get(long userId, long bookingId) {
-        User currentUser = UserMapper.toUser(userService.get(userId));
+        User currentUser = userMapper.toUser(userService.get(userId));
         Booking booking = bookingRepository.get(bookingId);
         if (booking.getBooker().equals(currentUser) || booking.getItem().getOwner().equals(currentUser)) {
-            return BookingMapper.toBookingDto(booking);
+            return bookingMapper.toBookingDto(booking);
         } else {
             throw new NotFoundException("Операция может быть выполнена только автором бронирования или владельцем вещи");
         }
@@ -41,12 +45,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingNestedDto getLastForItem(long itemId) {
-        return BookingMapper.toBookingNestedDto(bookingRepository.getLastForItem(itemId, LocalDateTime.now()));
+        return bookingMapper.toBookingNestedDto(bookingRepository.getLastForItem(itemId, LocalDateTime.now()));
     }
 
     @Override
     public BookingNestedDto getNextForItem(long itemId) {
-        return BookingMapper.toBookingNestedDto(bookingRepository.getNextForItem(itemId, LocalDateTime.now()));
+        return bookingMapper.toBookingNestedDto(bookingRepository.getNextForItem(itemId, LocalDateTime.now()));
     }
 
     @Override
@@ -75,7 +79,7 @@ public class BookingServiceImpl implements BookingService {
                 found = bookingRepository.getAllCurrent(userId, now);
                 break;
         }
-        return found.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
+        return found.stream().map(bookingMapper::toBookingDto).collect(Collectors.toList());
     }
 
     @Override
@@ -104,7 +108,7 @@ public class BookingServiceImpl implements BookingService {
                 found = bookingRepository.getAllCurrentForOwner(ownerId, now);
                 break;
         }
-        return found.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
+        return found.stream().map(bookingMapper::toBookingDto).collect(Collectors.toList());
     }
 
     @Override
@@ -115,7 +119,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto create(long userId, BookingToInputDto bookingToInputDto) {
-        User currentUser = UserMapper.toUser(userService.get(userId));
+        User currentUser = userMapper.toUser(userService.get(userId));
         Item item = itemRepository.get(bookingToInputDto.getItemId());
 
         if (userId == item.getOwner().getId()) {
@@ -126,12 +130,12 @@ public class BookingServiceImpl implements BookingService {
             throw new NotAvailableException("Вещь #" + item.getId() + " недоступна для бронирования");
         }
 
-        Booking newBooking = BookingMapper.toBooking(bookingToInputDto, currentUser, item);
+        Booking newBooking = bookingMapper.toBooking(bookingToInputDto, currentUser, item);
         validateDates(newBooking.getStart(), newBooking.getEnd());
         Booking created = bookingRepository.save(newBooking);
         log.info("Бронирование Вещи #{} для пользователя #{} было успешно создано. Владелец: #{}",
                 item.getId(), userId, item.getOwner().getId());
-        return BookingMapper.toBookingDto(created);
+        return bookingMapper.toBookingDto(created);
     }
 
     @Override
@@ -153,7 +157,7 @@ public class BookingServiceImpl implements BookingService {
 
         Booking patchedWithStatus = bookingRepository.save(booking);
         log.info("Статус Бронирования #{} изменен с {} на {}", id, currentStatus, newStatus);
-        return BookingMapper.toBookingDto(patchedWithStatus);
+        return bookingMapper.toBookingDto(patchedWithStatus);
     }
 
     private BookingKeyWords parse(String word) {

@@ -13,12 +13,16 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String text;
+
     @ManyToOne
     @JoinColumn(name = "itemid")
     private Item item;
+
     @ManyToOne
     @JoinColumn(name = "authorid")
     private User author;
+
     private LocalDateTime created;
 }
