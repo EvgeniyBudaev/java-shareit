@@ -38,15 +38,7 @@ public class BookingServiceImpl implements BookingService {
         User booker = userService.getUserById(bookerId);
         Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Вещь с id %s не найдена", booking.getItem().getId())));
-
-        if (bookerId == item.getUserId()) {
-            throw new AccessException("Владелец вещи не может бронировать свои вещи.");
-        } else if (!item.getAvailable()) {
-            throw new ObjectNotAvailableException(String.format("Вещь с id %d не доступна для бронирования.",
-                    item.getId()));
-        } else if (isNotValidDate(booking.getStart(), booking.getEnd())) {
-            throw new InvalidDataException("Даты бронирования выбраны некорректно.");
-        }
+        validateAddBooking(bookerId, booking, item);
         booking.setBooker(booker);
         booking.setStatus(Status.WAITING);
         booking.setItem(item);
@@ -189,5 +181,16 @@ public class BookingServiceImpl implements BookingService {
                 break;
         }
         return isUnable;
+    }
+
+    private void validateAddBooking(long bookerId, Booking booking, Item item) {
+        if (bookerId == item.getUserId()) {
+            throw new AccessException("Владелец вещи не может бронировать свои вещи.");
+        } else if (!item.getAvailable()) {
+            throw new ObjectNotAvailableException(String.format("Вещь с id %d не доступна для бронирования.",
+                    item.getId()));
+        } else if (isNotValidDate(booking.getStart(), booking.getEnd())) {
+            throw new InvalidDataException("Даты бронирования выбраны некорректно.");
+        }
     }
 }
