@@ -38,7 +38,8 @@ public class ItemController {
 
     @GetMapping     // Просмотр владельцем списка всех его вещей с указанием названия и описания для каждой
     public ResponseEntity<List<ItemDto>> getAllItems(@RequestHeader(userIdHeader) long userId) {
-        Logger.logRequest(HttpMethod.GET, "/items", "пусто");
+        UriComponents uriComponents = UriComponentsBuilder.newInstance().scheme("http").host("localhost").port("8080").path("/items").build();
+        Logger.logRequest(HttpMethod.GET, uriComponents.toUriString(), "пусто");
         return ResponseEntity.ok().body(itemService.getAllItems(userId));
     }
 
@@ -50,21 +51,24 @@ public class ItemController {
 
     @PatchMapping("{itemId}")
     public ResponseEntity<ItemDto> updateItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId, @RequestBody ItemDto itemDto) {
-        Logger.logRequest(HttpMethod.PATCH, "/items/" + itemId, itemDto.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance().scheme("http").host("localhost").port("8080").path("/items/{itemId}").build();
+        Logger.logRequest(HttpMethod.PATCH, uriComponents.toUriString(), itemDto.toString());
         return ResponseEntity.ok().body(itemService.updateItem(userId, itemId, itemDto));
     }
 
     @DeleteMapping("{itemId}")
     public ResponseEntity<Void> removeItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId) {
         itemService.removeItem(userId, itemId);
-        Logger.logRequest(HttpMethod.DELETE, "/items/" + itemId, "пусто");
+        UriComponents uriComponents = UriComponentsBuilder.newInstance().scheme("http").host("localhost").port("8080").path("/items/{itemId}").build();
+        Logger.logRequest(HttpMethod.DELETE, uriComponents.toUriString(), "пусто");
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<CommentDto> addComment(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId,
                                  @RequestBody @Valid CommentDto commentDto) {
-        Logger.logRequest(HttpMethod.POST, "/items/" + itemId + "/comment", commentDto.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance().scheme("http").host("localhost").port("8080").path("/items/{itemId}/comment").build();
+        Logger.logRequest(HttpMethod.POST, uriComponents.toUriString(), commentDto.toString());
         return ResponseEntity.ok().body(itemService.addComment(userId, itemId, commentDto));
     }
 }
