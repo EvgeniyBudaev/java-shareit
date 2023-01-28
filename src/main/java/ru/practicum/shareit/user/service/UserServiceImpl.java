@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.shareit.exception.DataExistException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.logger.Logger;
@@ -20,13 +22,22 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final String host = "localhost";
+    private final String port = "8080";
+    private final String protocol = "http";
 
     @Override
     public UserDto addUser(UserDto userDto) {
         User user = userMapper.convertFromDto(userDto);
         try {
             User userSaved = userRepository.save(user);
-            Logger.logSave(HttpMethod.POST, "/users", userSaved.toString());
+            UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                    .scheme(protocol)
+                    .host(host)
+                    .port(port)
+                    .path("/users")
+                    .build();
+            Logger.logSave(HttpMethod.POST, uriComponents.toUriString(), userSaved.toString());
             return userMapper.convertToDto(userSaved);
         } catch (RuntimeException e) {
             throw new DataExistException(String.format("Пользователь с email %s уже есть в базе", user.getEmail()));
@@ -46,7 +57,13 @@ public class UserServiceImpl implements UserService {
                 targetUser.setName(user.getName());
             }
             User userSaved = userRepository.save(targetUser);
-            Logger.logSave(HttpMethod.PATCH, "/users/" + id, userSaved.toString());
+            UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                    .scheme(protocol)
+                    .host(host)
+                    .port(port)
+                    .path("/users/{id}")
+                    .build();
+            Logger.logSave(HttpMethod.PATCH, uriComponents.toUriString(), userSaved.toString());
             return userMapper.convertToDto(userSaved);
         } catch (RuntimeException e) {
             throw new DataExistException(String.format("Пользователь с email %s уже есть в базе", user.getEmail()));
@@ -57,7 +74,13 @@ public class UserServiceImpl implements UserService {
     public User getUserById(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
-        Logger.logSave(HttpMethod.GET, "/users/" + userId, user.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/users/{userId}")
+                .build();
+        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), user.toString());
         return user;
     }
 
@@ -65,14 +88,26 @@ public class UserServiceImpl implements UserService {
     public UserDto getUser(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
-        Logger.logSave(HttpMethod.GET, "/users/" + userId, user.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/users/{userId}")
+                .build();
+        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), user.toString());
         return userMapper.convertToDto(user);
     }
 
     @Override
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
-        Logger.logSave(HttpMethod.GET, "/users", users.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/users")
+                .build();
+        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), users.toString());
         return users
                 .stream()
                 .map(userMapper::convertToDto)

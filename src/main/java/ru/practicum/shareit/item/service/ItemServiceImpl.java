@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.shareit.booking.dto.BookingDtoShort;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -39,6 +41,9 @@ public class ItemServiceImpl implements ItemService {
     private final BookingMapper bookingMapper;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
+    private final String host = "localhost";
+    private final String port = "8080";
+    private final String protocol = "http";
 
     @Override
     public ItemDto addItem(long userId, ItemDto itemDto) {
@@ -46,7 +51,13 @@ public class ItemServiceImpl implements ItemService {
         User user = userService.getUserById(userId);
         item.setUserId(user.getId());
         Item itemSaved = itemRepository.save(item);
-        Logger.logSave(HttpMethod.POST, "/items", itemSaved.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/items")
+                .build();
+        Logger.logSave(HttpMethod.POST, uriComponents.toUriString(), itemSaved.toString());
         return itemMapper.convertToDto(itemSaved);
     }
 
@@ -70,7 +81,13 @@ public class ItemServiceImpl implements ItemService {
                 targetItem.setDescription(item.getDescription());
             }
             Item itemSaved = itemRepository.save(targetItem);
-            Logger.logSave(HttpMethod.PATCH, "/items/" + itemId, itemSaved.toString());
+            UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                    .scheme(protocol)
+                    .host(host)
+                    .port(port)
+                    .path("/items/{itemId}")
+                    .build();
+            Logger.logSave(HttpMethod.PATCH, uriComponents.toUriString(), itemSaved.toString());
             return itemMapper.convertToDto(itemSaved);
         }
     }
@@ -95,7 +112,13 @@ public class ItemServiceImpl implements ItemService {
                 .map(commentMapper::convertToDto)
                 .collect(Collectors.toList());
         itemDto.setComments(commentsDto);
-        Logger.logSave(HttpMethod.GET, "/items/" + itemId, itemDto.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/items/{itemId}")
+                .build();
+        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), itemDto.toString());
         return itemDto;
     }
 
@@ -122,7 +145,13 @@ public class ItemServiceImpl implements ItemService {
             setBookings(itemDto, bookingDtoShorts);
             setComments(itemDto, comments);
         });
-        Logger.logSave(HttpMethod.GET, "/items", itemsDto.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/items")
+                .build();
+        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), itemsDto.toString());
         return itemsDto;
     }
 
@@ -134,7 +163,14 @@ public class ItemServiceImpl implements ItemService {
         } else {
             items = itemRepository.findByNameOrDescriptionLike(text.toLowerCase());
         }
-        Logger.logSave(HttpMethod.GET, "/items/search?text=" + text, items.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/items/")
+                .query("search?text={text}")
+                .build();
+        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), items.toString());
         return items
                 .stream()
                 .map(itemMapper::convertToDto)
@@ -147,7 +183,13 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Вещь с id %s не найдена", itemId)));
         itemRepository.deleteById(item.getId());
-        Logger.logSave(HttpMethod.DELETE, "/items/" + itemId, "Вещь удалена");
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/items/{itemId}")
+                .build();
+        Logger.logSave(HttpMethod.DELETE, uriComponents.toUriString(), "Вещь удалена");
     }
 
     @Override
@@ -167,7 +209,13 @@ public class ItemServiceImpl implements ItemService {
         comment.setItem(item);
         comment.setCreated(LocalDateTime.now());
         Comment commentSaved = commentRepository.save(comment);
-        Logger.logSave(HttpMethod.POST, "/items/" + itemId + "/comment", commentSaved.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/items/{itemId}/comment")
+                .build();
+        Logger.logSave(HttpMethod.POST, uriComponents.toUriString(), commentSaved.toString());
         return commentMapper.convertToDto(commentSaved);
     }
 

@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
@@ -30,6 +32,9 @@ public class BookingServiceImpl implements BookingService {
     private final UserService userService;
     private final BookingMapper bookingMapper;
     private final BookingRepository bookingRepository;
+    private final String host = "localhost";
+    private final String port = "8080";
+    private final String protocol = "http";
 
     @Override
     public BookingDto addBooking(long bookerId, BookingInputDto bookingInputDto) {
@@ -43,7 +48,13 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(Status.WAITING);
         booking.setItem(item);
         Booking bookingSaved = bookingRepository.save(booking);
-        Logger.logSave(HttpMethod.POST, "/bookings", bookingSaved.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/bookings")
+                .build();
+        Logger.logSave(HttpMethod.POST, uriComponents.toUriString(), bookingSaved.toString());
         return bookingMapper.convertToDto(bookingSaved);
     }
 
@@ -61,7 +72,14 @@ public class BookingServiceImpl implements BookingService {
             booking.setStatus(Status.REJECTED);
         }
         Booking bookingSaved = bookingRepository.save(booking);
-        Logger.logSave(HttpMethod.PATCH, "/bookings/" + bookingId + "?approved=" + approved, bookingSaved.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/bookings/")
+                .query("approved={approved}")
+                .build();
+        Logger.logSave(HttpMethod.PATCH, uriComponents.toUriString(), bookingSaved.toString());
         return bookingMapper.convertToDto(bookingSaved);
     }
 
@@ -74,7 +92,13 @@ public class BookingServiceImpl implements BookingService {
             throw new AccessException(String.format("У пользователя с id %d нет прав на просмотр бронирования с id %d,",
                     userId, bookingId));
         }
-        Logger.logSave(HttpMethod.GET, "/bookings/" + bookingId, booking.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/bookings/{bookingId}")
+                .build();
+        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), booking.toString());
         return booking;
     }
 
@@ -87,7 +111,13 @@ public class BookingServiceImpl implements BookingService {
             throw new AccessException(String.format("У пользователя с id %d нет прав на просмотр бронирования с id %d,",
                     userId, bookingId));
         }
-        Logger.logSave(HttpMethod.GET, "/bookings/" + bookingId, booking.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/bookings/{bookingId}")
+                .build();
+        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), booking.toString());
         return bookingMapper.convertToDto(booking);
     }
 
@@ -120,7 +150,14 @@ public class BookingServiceImpl implements BookingService {
             default:
                 bookings = bookingRepository.findAllByBookerId(booker.getId(), sort);
         }
-        Logger.logSave(HttpMethod.GET, "/bookings" + "?state=" + state, bookings.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/bookings/")
+                .query("state={state}")
+                .build();
+        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), bookings.toString());
         return bookings
                 .stream()
                 .map(bookingMapper::convertToDto)
@@ -156,7 +193,14 @@ public class BookingServiceImpl implements BookingService {
             default:
                 bookings = bookingRepository.findAllByOwnerId(owner.getId(), sort);
         }
-        Logger.logSave(HttpMethod.GET, "/bookings" + "/owner?state=" + state, bookings.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme(protocol)
+                .host(host)
+                .port(port)
+                .path("/bookings/owner")
+                .query("state={state}")
+                .build();
+        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), bookings.toString());
         return bookings.stream()
                 .map(bookingMapper::convertToDto)
                 .collect(Collectors.toList());
