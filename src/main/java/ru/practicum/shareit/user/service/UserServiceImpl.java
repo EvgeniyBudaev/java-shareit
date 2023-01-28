@@ -35,7 +35,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(long id, User user) {
+    public  UserDto updateUser(long id, UserDto userDto) {
+        User user = userMapper.convertFromDto(userDto);
         try {
             User targetUser = getUserById(id);
             if (StringUtils.hasLength(user.getEmail())) {
@@ -46,7 +47,7 @@ public class UserServiceImpl implements UserService {
             }
             User userSaved = userRepository.save(targetUser);
             Logger.logSave(HttpMethod.PATCH, "/users/" + id, userSaved.toString());
-            return userSaved;
+            return userMapper.convertToDto(userSaved);
         } catch (RuntimeException e) {
             throw new DataExistException(String.format("Пользователь с email %s уже есть в базе", user.getEmail()));
         }

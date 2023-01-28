@@ -18,10 +18,10 @@ public interface UserService {
     /**
      * Реализует обновление полей Пользователя
      * @param userId идентификатор Пользователя
-     * @param user объект Пользователь с изменениями
-     * @return User
+     * @param userDto объект Пользователь с изменениями
+     * @return UserDto
      */
-    User updateUser(long userId, User user) throws DataExistException;
+    UserDto updateUser(long userId, UserDto userDto) throws DataExistException;
 
     /**
      * Возвращает Пользователя по идентификатору

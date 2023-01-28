@@ -6,9 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.DataExistException;
 import ru.practicum.shareit.logger.Logger;
-import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
@@ -19,7 +17,6 @@ import java.util.List;
 @AllArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final UserMapper userMapper;
 
     @PostMapping
     public ResponseEntity<UserDto> addUser(@Valid @RequestBody UserDto userDto) throws DataExistException {
@@ -40,10 +37,9 @@ public class UserController {
     }
 
     @PatchMapping("{userId}")
-    public UserDto updateUser(@PathVariable long userId, @RequestBody UserDto userDto) throws DataExistException {
+    public ResponseEntity<UserDto> updateUser(@PathVariable long userId, @RequestBody UserDto userDto) throws DataExistException {
         Logger.logRequest(HttpMethod.PATCH, "/users/" + userId, userDto.toString());
-        User user = userMapper.convertFromDto(userDto);
-        return userMapper.convertToDto(userService.updateUser(userId, user));
+        return ResponseEntity.ok().body(userService.updateUser(userId, userDto));
     }
 
     @DeleteMapping("{userId}")
