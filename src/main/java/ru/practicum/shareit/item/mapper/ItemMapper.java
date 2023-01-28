@@ -1,12 +1,25 @@
 package ru.practicum.shareit.item.mapper;
 
-import org.mapstruct.Mapper;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
-@Mapper(componentModel = "spring")
-public interface ItemMapper {
-    ItemDto convertToDto(Item item);
+@Component
+public class ItemMapper {
+    private final ModelMapper modelMapper;
 
-    Item convertFromDto(ItemDto itemDto);
+    ItemMapper() {
+        modelMapper = new ModelMapper();
+        modelMapper.createTypeMap(ItemDto.class, Item.class)
+                .addMappings(modelMapper -> modelMapper.skip(Item::setUserId));
+    }
+
+    public ItemDto convertToDto(Item item) {
+        return modelMapper.map(item, ItemDto.class);
+    }
+
+    public Item convertFromDto(ItemDto itemDto) {
+        return modelMapper.map(itemDto, Item.class);
+    }
 }
