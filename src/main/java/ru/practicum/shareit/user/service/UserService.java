@@ -39,9 +39,9 @@ public interface UserService {
 
     /**
      * Возвращает коллекцию Пользователей
-     * @return коллекцию User
+     * @return коллекцию UserDto
      */
-    List<User> getAllUsers() throws DataExistException;
+    List<UserDto> getAllUsers() throws DataExistException;
 
     /**
      * Реализует удаление Пользователя из хранилища

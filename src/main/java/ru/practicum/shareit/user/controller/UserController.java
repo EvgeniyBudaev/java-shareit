@@ -13,7 +13,6 @@ import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -35,11 +34,9 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDto> getAllUsers() throws DataExistException {
+    public ResponseEntity<List<UserDto>> getAllUsers() throws DataExistException {
         Logger.logRequest(HttpMethod.GET, "/users", "пусто");
-        return userService.getAllUsers().stream()
-                .map(userMapper::convertToDto)
-                .collect(Collectors.toList());
+        return ResponseEntity.ok().body(userService.getAllUsers());
     }
 
     @PatchMapping("{userId}")

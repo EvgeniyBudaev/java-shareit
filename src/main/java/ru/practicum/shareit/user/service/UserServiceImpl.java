@@ -13,6 +13,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -68,10 +69,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
         Logger.logSave(HttpMethod.GET, "/users", users.toString());
-        return users;
+        return users
+                .stream()
+                .map(userMapper::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
