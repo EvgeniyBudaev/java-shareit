@@ -53,7 +53,7 @@ public class ItemController {
     public ResponseEntity<ItemDto> updateItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId, @RequestBody ItemDto itemDto) {
         Logger.logRequest(HttpMethod.PATCH, "/items/" + itemId, itemDto.toString());
         ItemDto itemUpdated = itemService.updateItem(userId, itemId, itemDto);
-        return ResponseEntity.status(201).body(itemUpdated);
+        return ResponseEntity.ok().body(itemUpdated);
     }
 
     @DeleteMapping("{itemId}")
