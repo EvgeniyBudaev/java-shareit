@@ -31,7 +31,8 @@ public class ItemController {
 
     @GetMapping("{itemId}")
     public ResponseEntity<ItemDto> getItem(@PathVariable long itemId, @RequestHeader(userIdHeader) long userId) {
-        Logger.logRequest(HttpMethod.GET, "/items/" + itemId, "пусто");
+        UriComponents uriComponents = UriComponentsBuilder.newInstance().scheme("http").host("localhost").port("8080").path("/items/{itemId}").build();
+        Logger.logRequest(HttpMethod.GET, uriComponents.toUriString(), "пусто");
         return ResponseEntity.ok().body(itemService.getItemById(itemId, userId));
     }
 
