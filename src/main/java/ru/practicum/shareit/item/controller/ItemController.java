@@ -5,6 +5,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -22,7 +24,8 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<ItemDto> addItem(@RequestHeader(userIdHeader) long userId, @Valid @RequestBody ItemDto itemDto) {
-        Logger.logRequest(HttpMethod.POST, "/items", itemDto.toString());
+        UriComponents uriComponents = UriComponentsBuilder.newInstance().scheme("http").host("localhost").port("8080").path("/items").build();
+        Logger.logRequest(HttpMethod.POST, uriComponents.toUriString(), itemDto.toString());
         return ResponseEntity.status(201).body(itemService.addItem(userId, itemDto));
     }
 
