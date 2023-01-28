@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingInputDto;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.*;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.AccessException;
@@ -22,12 +25,14 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class BookingServiceImpl implements BookingService {
-    private final UserService userService;
-    private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
+    private final UserService userService;
+    private final BookingMapper bookingMapper;
+    private final BookingRepository bookingRepository;
 
     @Override
-    public Booking addBooking(long bookerId, Booking booking) {
+    public BookingDto addBooking(long bookerId, BookingInputDto bookingInputDto) {
+        Booking booking = bookingMapper.convertFromDto(bookingInputDto);
         Logger.logInfo(HttpMethod.POST, "/bookings", booking.toString());
         User booker = userService.getUserById(bookerId);
         Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
@@ -46,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setItem(item);
         Booking bookingSaved = bookingRepository.save(booking);
         Logger.logSave(HttpMethod.POST, "/bookings", bookingSaved.toString());
-        return bookingSaved;
+        return bookingMapper.convertToDto(bookingSaved);
     }
 
     @Override

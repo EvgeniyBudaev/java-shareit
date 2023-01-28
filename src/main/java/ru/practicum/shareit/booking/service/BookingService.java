@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.booking.model.AccessLevel;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
@@ -10,10 +12,10 @@ public interface BookingService {
     /**
      * Реализует бронирование
      * @param bookerId идентификатор
-     * @param booking Бронь
-     * @return Booking
+     * @param bookingInputDto Бронь
+     * @return BookingDto
      */
-    Booking addBooking(long bookerId, Booking booking);
+    BookingDto addBooking(long bookerId, BookingInputDto bookingInputDto);
 
     /**
      * Реализует подтверждение или отклонение запроса на бронирование

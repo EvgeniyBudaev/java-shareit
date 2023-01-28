@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.model.AccessLevel;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -25,13 +26,11 @@ public class BookingController {
     private final StateEnumConverter converter;
     private final String userIdHeader = "X-Sharer-User-Id";
 
-
     @PostMapping    // Добавление нового запроса на бронирование.
-    public BookingDto addBooking(@RequestHeader(userIdHeader) long userId,
-                          @Valid @RequestBody BookingInputDto bookingInputDto) {
+    public ResponseEntity<BookingDto> addBooking(@RequestHeader(userIdHeader) long userId,
+                                                 @Valid @RequestBody BookingInputDto bookingInputDto) {
         Logger.logRequest(HttpMethod.POST, "/bookings", bookingInputDto.toString());
-        Booking booking = bookingService.addBooking(userId, bookingMapper.convertFromDto(bookingInputDto));
-        return bookingMapper.convertToDto(booking);
+        return ResponseEntity.status(201).body(bookingService.addBooking(userId, bookingInputDto));
     }
 
     @PatchMapping("/{bookingId}")   // Подтверждение или отклонение запроса на бронирование.
