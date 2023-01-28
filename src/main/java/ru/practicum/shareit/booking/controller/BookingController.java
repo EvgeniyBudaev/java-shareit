@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.shareit.booking.model.AccessLevel;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInputDto;
@@ -37,8 +36,7 @@ public class BookingController {
     @PostMapping    // Добавление нового запроса на бронирование.
     public BookingDto addBooking(@RequestHeader(userIdHeader) long userId,
                           @Valid @RequestBody BookingInputDto bookingInputDto) {
-        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl("/bookings");
-        Logger.logRequest(HttpMethod.POST, uriComponentsBuilder.toUriString(), bookingInputDto.toString());
+        Logger.logRequest(HttpMethod.POST, "/bookings/", bookingInputDto.toString());
         Booking booking = bookingService.addBooking(userId, bookingMapper.convertFromDto(bookingInputDto));
         return bookingMapper.convertToDto(booking);
     }
