@@ -55,7 +55,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Booking approveOrRejectBooking(long ownerId, long bookingId, boolean approved, AccessLevel accessLevel) {
+    public BookingDto approveOrRejectBooking(long ownerId, long bookingId, boolean approved, AccessLevel accessLevel) {
         User owner = userService.getUserById(ownerId);
         Booking booking = getBookingById(bookingId, owner.getId(), accessLevel);
         if (booking.getStatus().equals(Status.APPROVED)) {
@@ -69,7 +69,7 @@ public class BookingServiceImpl implements BookingService {
         }
         Booking bookingSaved = bookingRepository.save(booking);
         Logger.logSave(HttpMethod.PATCH, "/bookings/" + bookingId + "?approved=" + approved, bookingSaved.toString());
-        return bookingSaved;
+        return bookingMapper.convertToDto(bookingSaved);
     }
 
     @Override

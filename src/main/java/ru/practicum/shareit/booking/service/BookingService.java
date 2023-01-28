@@ -23,9 +23,9 @@ public interface BookingService {
      * @param bookingId идентификатор Брони
      * @param approved статус бронирования
      * @param accessLevel уровень доступа
-     * @return Booking
+     * @return BookingDto
      */
-    Booking approveOrRejectBooking(long ownerId, long bookingId, boolean approved, AccessLevel accessLevel);
+    BookingDto approveOrRejectBooking(long ownerId, long bookingId, boolean approved, AccessLevel accessLevel);
 
     /**
      * Возвращает Бронирование по идентификатору

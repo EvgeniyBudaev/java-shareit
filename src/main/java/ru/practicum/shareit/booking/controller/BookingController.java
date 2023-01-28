@@ -34,11 +34,10 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")   // Подтверждение или отклонение запроса на бронирование.
-    public BookingDto approveOrRejectBooking(@PathVariable long bookingId, @RequestParam boolean approved,
+    public ResponseEntity<BookingDto> approveOrRejectBooking(@PathVariable long bookingId, @RequestParam boolean approved,
                                       @RequestHeader(userIdHeader) long userId) {
         Logger.logRequest(HttpMethod.PATCH, "/bookings/" + bookingId + "?approved=" + approved, "no body");
-        Booking booking = bookingService.approveOrRejectBooking(userId, bookingId, approved, AccessLevel.OWNER);
-        return bookingMapper.convertToDto(booking);
+        return ResponseEntity.status(201).body(bookingService.approveOrRejectBooking(userId, bookingId, approved, AccessLevel.OWNER));
     }
 
     @GetMapping("/{bookingId}")   // Получение данных о конкретном бронировании (включая его статус)
