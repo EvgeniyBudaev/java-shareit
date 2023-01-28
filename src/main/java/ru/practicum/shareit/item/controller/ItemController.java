@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -34,23 +35,23 @@ public class ItemController {
     }
 
     @GetMapping("{itemId}")
-    public ItemDto getItem(@PathVariable long itemId, @RequestHeader(userIdHeader) long userId) {
+    public ResponseEntity<ItemDto> getItem(@PathVariable long itemId, @RequestHeader(userIdHeader) long userId) {
         Logger.logRequest(HttpMethod.GET, "/items/" + itemId, "пусто");
-        return itemService.getItemById(itemId, userId);
+        return ResponseEntity.ok().body(itemService.getItemById(itemId, userId));
     }
 
     @GetMapping     // Просмотр владельцем списка всех его вещей с указанием названия и описания для каждой
-    public List<ItemDto> getAllItems(@RequestHeader(userIdHeader) long userId) {
+    public ResponseEntity<List<ItemDto>> getAllItems(@RequestHeader(userIdHeader) long userId) {
         Logger.logRequest(HttpMethod.GET, "/items", "пусто");
-        return itemService.getAllItems(userId);
+        return ResponseEntity.ok().body(itemService.getAllItems(userId));
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestParam String text) {
+    public ResponseEntity<List<ItemDto>> searchItems(@RequestParam String text) {
         Logger.logRequest(HttpMethod.GET, "/items/search?text=" + text, "пусто");
-        return itemService.searchItems(text).stream()
+        return ResponseEntity.ok().body(itemService.searchItems(text).stream()
                 .map(itemMapper::convertToDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     @PatchMapping("{itemId}")
@@ -61,9 +62,10 @@ public class ItemController {
     }
 
     @DeleteMapping("{itemId}")
-    public void removeItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId) {
+    public ResponseEntity<Void> removeItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId) {
         Logger.logRequest(HttpMethod.DELETE, "/items/" + itemId, "пусто");
         itemService.removeItem(userId, itemId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/{itemId}/comment")
