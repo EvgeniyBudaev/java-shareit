@@ -26,7 +26,7 @@ public class BookingController {
 
 
     @PostMapping    // Добавление нового запроса на бронирование.
-    BookingDto addBooking(@RequestHeader("X-Sharer-User-Id") long userId,
+    public BookingDto addBooking(@RequestHeader("X-Sharer-User-Id") long userId,
                           @Valid @RequestBody BookingInputDto bookingInputDto) {
         Logger.logRequest(HttpMethod.POST, "/bookings", bookingInputDto.toString());
         Booking booking = bookingService.addBooking(userId, bookingMapper.convertFromDto(bookingInputDto));
@@ -34,7 +34,7 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")   // Подтверждение или отклонение запроса на бронирование.
-    BookingDto approveOrRejectBooking(@PathVariable long bookingId, @RequestParam boolean approved,
+    public BookingDto approveOrRejectBooking(@PathVariable long bookingId, @RequestParam boolean approved,
                                       @RequestHeader("X-Sharer-User-Id") long userId) {
         Logger.logRequest(HttpMethod.PATCH, "/bookings/" + bookingId + "?approved=" + approved, "no body");
         Booking booking = bookingService.approveOrRejectBooking(userId, bookingId, approved, AccessLevel.OWNER);
@@ -42,14 +42,14 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")   // Получение данных о конкретном бронировании (включая его статус)
-    BookingDto getBookingById(@PathVariable long bookingId, @RequestHeader("X-Sharer-User-Id") long userId) {
+    public BookingDto getBookingById(@PathVariable long bookingId, @RequestHeader("X-Sharer-User-Id") long userId) {
         Logger.logRequest(HttpMethod.GET, "/bookings/" + bookingId, "no body");
         Booking booking = bookingService.getBookingById(bookingId, userId, AccessLevel.OWNER_AND_BOOKER);
         return bookingMapper.convertToDto(booking);
     }
 
     @GetMapping   // Получение списка всех бронирований текущего пользователя (можно делать выборку по статусу).
-    List<BookingDto> getBookingsOfCurrentUser(@RequestParam(defaultValue = "ALL") String state,
+    public List<BookingDto> getBookingsOfCurrentUser(@RequestParam(defaultValue = "ALL") String state,
                                               @RequestHeader("X-Sharer-User-Id") long userId) {
         Logger.logRequest(HttpMethod.GET, "/bookings" + "?state=" + state, "no body");
         List<Booking> bookings = bookingService.getBookingsOfCurrentUser(converter.convert(state), userId);
@@ -60,7 +60,7 @@ public class BookingController {
 
     // Получение списка бронирований для всех вещей текущего пользователя-владельца (можно делать выборку по статусу)
     @GetMapping("/owner")
-    List<BookingDto> getBookingsOfOwner(@RequestParam(defaultValue = "ALL") String state,
+    public List<BookingDto> getBookingsOfOwner(@RequestParam(defaultValue = "ALL") String state,
                                         @RequestHeader("X-Sharer-User-Id") long userId) {
         Logger.logRequest(HttpMethod.GET, "/bookings" + "/owner?state=" + state, "no body");
         List<Booking> bookings = bookingService.getBookingsOfOwner(converter.convert(state), userId);
