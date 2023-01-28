@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
                     .build();
             Logger.logSave(HttpMethod.POST, uriComponents.toUriString(), userSaved.toString());
             return userMapper.convertToDto(userSaved);
-        } catch (RuntimeException e) {
+        } catch (DataExistException e) {
             throw new DataExistException(String.format("Пользователь с email %s уже есть в базе", user.getEmail()));
         }
 
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
                     .build();
             Logger.logSave(HttpMethod.PATCH, uriComponents.toUriString(), userSaved.toString());
             return userMapper.convertToDto(userSaved);
-        } catch (RuntimeException e) {
+        } catch (DataExistException e) {
             throw new DataExistException(String.format("Пользователь с email %s уже есть в базе", user.getEmail()));
         }
     }
