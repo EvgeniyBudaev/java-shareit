@@ -37,7 +37,7 @@ public class BookingController {
     public ResponseEntity<BookingDto> approveOrRejectBooking(@PathVariable long bookingId, @RequestParam boolean approved,
                                       @RequestHeader(userIdHeader) long userId) {
         Logger.logRequest(HttpMethod.PATCH, "/bookings/" + bookingId + "?approved=" + approved, "no body");
-        return ResponseEntity.status(201).body(bookingService.approveOrRejectBooking(userId, bookingId, approved, AccessLevel.OWNER));
+        return ResponseEntity.ok().body(bookingService.approveOrRejectBooking(userId, bookingId, approved, AccessLevel.OWNER));
     }
 
     @GetMapping("/{bookingId}")   // Получение данных о конкретном бронировании (включая его статус)
