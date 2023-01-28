@@ -51,7 +51,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item updateItem(long userId, long itemId, Item item) {
+    public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
+        Item item = itemMapper.convertFromDto(itemDto);
         User user = userService.getUserById(userId);
         Item targetItem = itemRepository.findById(itemId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Вещь с id %s не найдена", itemId)));
@@ -70,7 +71,7 @@ public class ItemServiceImpl implements ItemService {
             }
             Item itemSaved = itemRepository.save(targetItem);
             Logger.logSave(HttpMethod.PATCH, "/items/" + itemId, itemSaved.toString());
-            return itemSaved;
+            return itemMapper.convertToDto(itemSaved);
         }
     }
 
@@ -126,7 +127,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> searchItems(String text) {
+    public List<ItemDto> searchItems(String text) {
         List<Item> items;
         if (text.isBlank()) {
             items = new ArrayList<>();
@@ -134,7 +135,10 @@ public class ItemServiceImpl implements ItemService {
             items = itemRepository.findByNameOrDescriptionLike(text.toLowerCase());
         }
         Logger.logSave(HttpMethod.GET, "/items/search?text=" + text, items.toString());
-        return items;
+        return items
+                .stream()
+                .map(itemMapper::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override

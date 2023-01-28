@@ -19,10 +19,10 @@ public interface ItemService {
      * Реализует обновление полей хранимой Вещи
      * @param userId идентификатор Пользователя владельца
      * @param itemId идентификатор Вещи
-     * @param item Вещь
-     * @return объект Item
+     * @param itemDto Вещь
+     * @return объект ItemDto
      */
-    Item updateItem(long userId, long itemId, Item item);
+    ItemDto updateItem(long userId, long itemId, ItemDto itemDto);
 
     /**
      * Возвращает ItemDto Вещи Пользователя
@@ -42,9 +42,9 @@ public interface ItemService {
     /**
      * Реализует поиск Вещей в хранилище по ключевому слову
      * @param text ключевое слово для поиска
-     * @return коллекцию Item
+     * @return коллекцию ItemDto
      */
-    List<Item> searchItems(String text);
+    List<ItemDto> searchItems(String text);
 
     /**
      * Реализует удаление Вещи из хранилища
