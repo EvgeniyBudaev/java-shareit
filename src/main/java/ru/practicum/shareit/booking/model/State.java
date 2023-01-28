@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.model;
 
+import ru.practicum.shareit.exception.ArgumentException;
+
 public enum State {
     ALL, CURRENT, PAST, FUTURE, WAITING, REJECTED;
 
@@ -7,7 +9,7 @@ public enum State {
         try {
             return State.valueOf(source);
         } catch (Exception e) {
-            throw new IllegalArgumentException(String.format("Unknown state: %S", source));
+            throw new ArgumentException(String.format("Unknown state: %S", source));
         }
     }
 }
