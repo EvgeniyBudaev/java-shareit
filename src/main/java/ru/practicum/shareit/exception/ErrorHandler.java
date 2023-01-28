@@ -41,4 +41,11 @@ public class ErrorHandler {
         log.warn(e.getClass().getSimpleName(), e);
         return new ErrorResponse(404, "Not Found", e.getMessage());
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({ArgumentException.class})
+    public ErrorResponse handleNotValidExceptionHandler(RuntimeException e) {
+        log.warn(e.getClass().getSimpleName(), e);
+        return new ErrorResponse(400, "Bad Request", e.getMessage());
+    }
 }
