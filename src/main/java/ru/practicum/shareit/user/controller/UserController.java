@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.DataExistException;
@@ -43,8 +44,9 @@ public class UserController {
     }
 
     @DeleteMapping("{userId}")
-    public void removeUser(@PathVariable long userId) {
+    public ResponseEntity<Void> removeUser(@PathVariable long userId) {
         Logger.logRequest(HttpMethod.DELETE, "/users/" + userId, "пусто");
         userService.removeUser(userId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
