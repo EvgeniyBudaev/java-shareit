@@ -60,6 +60,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDto getUser(long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
+        Logger.logSave(HttpMethod.GET, "/users/" + userId, user.toString());
+        return userMapper.convertToDto(user);
+    }
+
+    @Override
     public List<User> getAllUsers() {
         List<User> users = userRepository.findAll();
         Logger.logSave(HttpMethod.GET, "/users", users.toString());

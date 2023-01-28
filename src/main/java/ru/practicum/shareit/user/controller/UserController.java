@@ -29,9 +29,9 @@ public class UserController {
     }
 
     @GetMapping("{userId}")
-    public UserDto getUserById(@PathVariable long userId) {
+    public ResponseEntity<UserDto> getUserById(@PathVariable long userId) {
         Logger.logRequest(HttpMethod.GET, "/users/" + userId, "пусто");
-        return userMapper.convertToDto(userService.getUserById(userId));
+        return ResponseEntity.ok().body(userService.getUser(userId));
     }
 
     @GetMapping
