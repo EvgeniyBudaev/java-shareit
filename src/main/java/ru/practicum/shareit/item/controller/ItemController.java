@@ -45,7 +45,14 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<List<ItemDto>> searchItems(@RequestParam String text) {
-        Logger.logRequest(HttpMethod.GET, "/items/search?text=" + text, "пусто");
+        UriComponents uriComponents = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port("8080")
+                .path("/items/")
+                .query("search?text={text}")
+                .build();
+        Logger.logRequest(HttpMethod.GET, uriComponents.toUriString(), "пусто");
         return ResponseEntity.ok().body(itemService.searchItems(text));
     }
 
