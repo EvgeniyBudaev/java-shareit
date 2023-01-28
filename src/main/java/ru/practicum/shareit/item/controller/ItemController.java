@@ -66,6 +66,6 @@ public class ItemController {
     public ResponseEntity<CommentDto> addComment(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId,
                                  @RequestBody @Valid CommentDto commentDto) {
         Logger.logRequest(HttpMethod.POST, "/items/" + itemId + "/comment", commentDto.toString());
-        return ResponseEntity.status(201).body(itemService.addComment(userId, itemId, commentDto));
+        return ResponseEntity.ok().body(itemService.addComment(userId, itemId, commentDto));
     }
 }
