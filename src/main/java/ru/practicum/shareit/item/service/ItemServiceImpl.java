@@ -126,7 +126,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> searchItems(String text) {
+    public List<ItemDto> searchItems(String text) {
         List<Item> items;
         if (text.isBlank()) {
             items = new ArrayList<>();
@@ -134,7 +134,10 @@ public class ItemServiceImpl implements ItemService {
             items = itemRepository.findByNameOrDescriptionLike(text.toLowerCase());
         }
         Logger.logSave(HttpMethod.GET, "/items/search?text=" + text, items.toString());
-        return items;
+        return items
+                .stream()
+                .map(itemMapper::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override

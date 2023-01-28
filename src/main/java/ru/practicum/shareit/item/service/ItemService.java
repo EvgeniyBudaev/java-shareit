@@ -42,9 +42,9 @@ public interface ItemService {
     /**
      * Реализует поиск Вещей в хранилище по ключевому слову
      * @param text ключевое слово для поиска
-     * @return коллекцию Item
+     * @return коллекцию ItemDto
      */
-    List<Item> searchItems(String text);
+    List<ItemDto> searchItems(String text);
 
     /**
      * Реализует удаление Вещи из хранилища
