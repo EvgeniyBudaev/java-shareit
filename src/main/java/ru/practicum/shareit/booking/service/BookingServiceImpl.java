@@ -21,6 +21,7 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -86,7 +87,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getBookingsOfCurrentUser(State state, long bookerId) {
+    public List<BookingDto> getBookingsOfCurrentUser(State state, long bookerId) {
         User booker = userService.getUserById(bookerId);
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
         List<Booking> bookings;
@@ -115,7 +116,10 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findAllByBookerId(booker.getId(), sort);
         }
         Logger.logSave(HttpMethod.GET, "/bookings" + "?state=" + state, bookings.toString());
-        return bookings;
+        return bookings
+                .stream()
+                .map(bookingMapper::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override

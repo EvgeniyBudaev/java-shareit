@@ -48,13 +48,10 @@ public class BookingController {
     }
 
     @GetMapping   // Получение списка всех бронирований текущего пользователя (можно делать выборку по статусу).
-    public List<BookingDto> getBookingsOfCurrentUser(@RequestParam(defaultValue = "ALL") String state,
+    public ResponseEntity<List<BookingDto>> getBookingsOfCurrentUser(@RequestParam(defaultValue = "ALL") String state,
                                               @RequestHeader(userIdHeader) long userId) {
         Logger.logRequest(HttpMethod.GET, "/bookings" + "?state=" + state, "no body");
-        List<Booking> bookings = bookingService.getBookingsOfCurrentUser(converter.convert(state), userId);
-        return bookings.stream()
-                .map(bookingMapper::convertToDto)
-                .collect(Collectors.toList());
+        return ResponseEntity.ok().body(bookingService.getBookingsOfCurrentUser(converter.convert(state), userId));
     }
 
     // Получение списка бронирований для всех вещей текущего пользователя-владельца (можно делать выборку по статусу)
