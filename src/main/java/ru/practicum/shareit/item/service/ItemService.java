@@ -19,10 +19,10 @@ public interface ItemService {
      * Реализует обновление полей хранимой Вещи
      * @param userId идентификатор Пользователя владельца
      * @param itemId идентификатор Вещи
-     * @param itemDto Вещь
-     * @return объект ItemDto
+     * @param item Вещь
+     * @return объект Item
      */
-    ItemDto updateItem(long userId, long itemId, ItemDto itemDto);
+    Item updateItem(long userId, long itemId, Item item);
 
     /**
      * Возвращает ItemDto Вещи Пользователя
