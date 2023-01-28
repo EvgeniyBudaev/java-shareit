@@ -48,7 +48,7 @@ public interface BookingService {
      * Возвращает коллекцию Booking для текущего Владельца
      * @param state состояние
      * @param ownerId идентификатор Владельца
-     * @return коллекцию Booking
+     * @return коллекцию BookingDto
      */
-    List<Booking> getBookingsOfOwner(State state, long ownerId);
+    List<BookingDto> getBookingsOfOwner(State state, long ownerId);
 }

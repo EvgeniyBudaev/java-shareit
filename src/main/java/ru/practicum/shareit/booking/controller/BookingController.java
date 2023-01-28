@@ -15,7 +15,6 @@ import ru.practicum.shareit.logger.Logger;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/bookings")
@@ -56,12 +55,9 @@ public class BookingController {
 
     // Получение списка бронирований для всех вещей текущего пользователя-владельца (можно делать выборку по статусу)
     @GetMapping("/owner")
-    public List<BookingDto> getBookingsOfOwner(@RequestParam(defaultValue = "ALL") String state,
+    public ResponseEntity<List<BookingDto>> getBookingsOfOwner(@RequestParam(defaultValue = "ALL") String state,
                                         @RequestHeader(userIdHeader) long userId) {
         Logger.logRequest(HttpMethod.GET, "/bookings" + "/owner?state=" + state, "no body");
-        List<Booking> bookings = bookingService.getBookingsOfOwner(converter.convert(state), userId);
-        return bookings.stream()
-                .map(bookingMapper::convertToDto)
-                .collect(Collectors.toList());
+        return ResponseEntity.ok().body(bookingService.getBookingsOfOwner(converter.convert(state), userId));
     }
 }

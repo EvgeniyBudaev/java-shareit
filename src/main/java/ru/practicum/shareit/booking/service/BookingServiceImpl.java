@@ -123,7 +123,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getBookingsOfOwner(State state, long ownerId) {
+    public List<BookingDto> getBookingsOfOwner(State state, long ownerId) {
         User owner = userService.getUserById(ownerId);
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
         List<Booking> bookings;
@@ -152,7 +152,9 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findAllByOwnerId(owner.getId(), sort);
         }
         Logger.logSave(HttpMethod.GET, "/bookings" + "/owner?state=" + state, bookings.toString());
-        return bookings;
+        return bookings.stream()
+                .map(bookingMapper::convertToDto)
+                .collect(Collectors.toList());
     }
 
     private boolean isNotValidDate(LocalDateTime startBooking, LocalDateTime endBooking) {
