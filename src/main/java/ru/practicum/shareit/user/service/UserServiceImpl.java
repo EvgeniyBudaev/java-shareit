@@ -7,6 +7,8 @@ import org.springframework.util.StringUtils;
 import ru.practicum.shareit.exception.DataExistException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.logger.Logger;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -15,14 +17,16 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
+    private final UserMapper userMapper;
     private final UserRepository userRepository;
 
     @Override
-    public User addUser(User user) {
+    public UserDto addUser(UserDto userDto) {
+        User user = userMapper.convertFromDto(userDto);
         try {
             User userSaved = userRepository.save(user);
             Logger.logSave(HttpMethod.POST, "/users", userSaved.toString());
-            return userSaved;
+            return userMapper.convertToDto(userSaved);
         } catch (RuntimeException e) {
             throw new DataExistException(String.format("Пользователь с email %s уже есть в базе", user.getEmail()));
         }

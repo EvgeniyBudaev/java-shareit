@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.DataExistException;
 import ru.practicum.shareit.logger.Logger;
@@ -22,10 +23,9 @@ public class UserController {
     private final UserMapper userMapper;
 
     @PostMapping
-    public UserDto addUser(@Valid @RequestBody UserDto userDto) throws DataExistException {
+    public ResponseEntity<UserDto> addUser(@Valid @RequestBody UserDto userDto) throws DataExistException {
         Logger.logRequest(HttpMethod.POST, "/users", userDto.toString());
-        User user = userMapper.convertFromDto(userDto);
-        return userMapper.convertToDto(userService.addUser(user));
+        return ResponseEntity.status(201).body(userService.addUser(userDto));
     }
 
     @GetMapping("{userId}")

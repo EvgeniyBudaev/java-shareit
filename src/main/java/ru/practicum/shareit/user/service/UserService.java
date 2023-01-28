@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import ru.practicum.shareit.exception.DataExistException;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -9,10 +10,10 @@ public interface UserService {
 
     /**
      * Реализует добавление Пользователя в хранилище
-     * @param user объект Пользователь
-     * @return User
+     * @param userDto объект Пользователь
+     * @return UserDto
      */
-    User addUser(User user) throws DataExistException;
+    UserDto addUser(UserDto userDto) throws DataExistException;
 
     /**
      * Реализует обновление полей Пользователя
