@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
@@ -19,10 +18,10 @@ public interface ItemService {
      * Реализует обновление полей хранимой Вещи
      * @param userId идентификатор Пользователя владельца
      * @param itemId идентификатор Вещи
-     * @param item Вещь
-     * @return объект Item
+     * @param itemDto Вещь
+     * @return объект ItemDto
      */
-    Item updateItem(long userId, long itemId, Item item);
+    ItemDto updateItem(long userId, long itemId, ItemDto itemDto);
 
     /**
      * Возвращает ItemDto Вещи Пользователя

@@ -7,10 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.logger.Logger;
 
@@ -22,7 +20,6 @@ import java.util.List;
 @AllArgsConstructor
 public class ItemController {
     private final ItemService itemService;
-    private final ItemMapper itemMapper;
     private final CommentMapper commentMapper;
     private final String userIdHeader = "X-Sharer-User-Id";
 
@@ -53,10 +50,10 @@ public class ItemController {
 
 
     @PatchMapping("{itemId}")
-    public ItemDto updateItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId, @RequestBody ItemDto itemDto) {
+    public ResponseEntity<ItemDto> updateItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId, @RequestBody ItemDto itemDto) {
         Logger.logRequest(HttpMethod.PATCH, "/items/" + itemId, itemDto.toString());
-        Item item = itemMapper.convertFromDto(itemDto);
-        return itemMapper.convertToDto(itemService.updateItem(userId, itemId, item));
+        ItemDto itemUpdated = itemService.updateItem(userId, itemId, itemDto);
+        return ResponseEntity.status(201).body(itemUpdated);
     }
 
     @DeleteMapping("{itemId}")
