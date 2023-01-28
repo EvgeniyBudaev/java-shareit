@@ -15,6 +15,7 @@ import ru.practicum.shareit.logger.Logger;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/items")
@@ -47,7 +48,9 @@ public class ItemController {
     @GetMapping("/search")
     public ResponseEntity<List<ItemDto>> searchItems(@RequestParam String text) {
         Logger.logRequest(HttpMethod.GET, "/items/search?text=" + text, "пусто");
-        return ResponseEntity.ok().body(itemService.searchItems(text));
+        return ResponseEntity.ok().body(itemService.searchItems(text).stream()
+                .map(itemMapper::convertToDto)
+                .collect(Collectors.toList()));
     }
 
     @PatchMapping("{itemId}")

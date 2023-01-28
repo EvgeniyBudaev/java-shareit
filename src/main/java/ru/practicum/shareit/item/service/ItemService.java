@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
@@ -41,9 +42,9 @@ public interface ItemService {
     /**
      * Реализует поиск Вещей в хранилище по ключевому слову
      * @param text ключевое слово для поиска
-     * @return коллекцию ItemDto
+     * @return коллекцию Item
      */
-    List<ItemDto> searchItems(String text);
+    List<Item> searchItems(String text);
 
     /**
      * Реализует удаление Вещи из хранилища
