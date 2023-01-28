@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.logger.Logger;
 
@@ -25,8 +24,8 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<ItemDto> addItem(@RequestHeader(userIdHeader) long userId, @Valid @RequestBody ItemDto itemDto) {
-        Logger.logRequest(HttpMethod.POST, "/items", itemDto.toString());
         ItemDto itemCreated = itemService.addItem(userId, itemDto);
+        Logger.logRequest(HttpMethod.POST, "/items", itemDto.toString());
         return ResponseEntity.status(201).body(itemCreated);
     }
 
@@ -51,23 +50,22 @@ public class ItemController {
 
     @PatchMapping("{itemId}")
     public ResponseEntity<ItemDto> updateItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId, @RequestBody ItemDto itemDto) {
-        Logger.logRequest(HttpMethod.PATCH, "/items/" + itemId, itemDto.toString());
         ItemDto itemUpdated = itemService.updateItem(userId, itemId, itemDto);
+        Logger.logRequest(HttpMethod.PATCH, "/items/" + itemId, itemDto.toString());
         return ResponseEntity.ok().body(itemUpdated);
     }
 
     @DeleteMapping("{itemId}")
     public ResponseEntity<Void> removeItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId) {
-        Logger.logRequest(HttpMethod.DELETE, "/items/" + itemId, "пусто");
         itemService.removeItem(userId, itemId);
+        Logger.logRequest(HttpMethod.DELETE, "/items/" + itemId, "пусто");
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto addComment(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId,
+    public ResponseEntity<CommentDto> addComment(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId,
                                  @RequestBody @Valid CommentDto commentDto) {
         Logger.logRequest(HttpMethod.POST, "/items/" + itemId + "/comment", commentDto.toString());
-        Comment comment = commentMapper.convertFromDto(commentDto);
-        return commentMapper.convertToDto(itemService.addComment(userId, itemId, comment));
+        return ResponseEntity.status(201).body(itemService.addComment(userId, itemId, commentDto));
     }
 }

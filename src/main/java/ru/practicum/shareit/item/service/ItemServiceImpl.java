@@ -151,7 +151,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Comment addComment(long userId, long itemId, Comment comment) {
+    public CommentDto addComment(long userId, long itemId, CommentDto commentDto) {
+        Comment comment = commentMapper.convertFromDto(commentDto);
         User user = userService.getUserById(userId);
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ObjectNotFoundException(
                 String.format("Вещь с id %s не найдена", itemId)));
@@ -167,7 +168,7 @@ public class ItemServiceImpl implements ItemService {
         comment.setCreated(LocalDateTime.now());
         Comment commentSaved = commentRepository.save(comment);
         Logger.logSave(HttpMethod.POST, "/items/" + itemId + "/comment", commentSaved.toString());
-        return commentSaved;
+        return commentMapper.convertToDto(commentSaved);
     }
 
     private void setBookings(ItemDto itemDto, List<BookingDtoShort> bookings) {

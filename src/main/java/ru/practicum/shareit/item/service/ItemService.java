@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.service;
 
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Comment;
 
 import java.util.List;
 
@@ -56,8 +56,8 @@ public interface ItemService {
      * Реализует добавления Комментария
      * @param userId идентификатор Пользователя владельца Вещи
      * @param itemId идентификатор Вещи
-     * @param comment Комментарий
-     * @return Comment
+     * @param commentDto Комментарий
+     * @return CommentDto
      */
-    Comment addComment(long userId, long itemId, Comment comment);
+    CommentDto addComment(long userId, long itemId, CommentDto commentDto);
 }
