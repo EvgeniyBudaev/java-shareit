@@ -44,7 +44,7 @@ public class ErrorHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({ArgumentException.class})
-    public ErrorResponse handleNotValidExceptionHandler(RuntimeException e) {
+    public ErrorResponse handleArgumentExceptionHandler(RuntimeException e) {
         log.warn(e.getClass().getSimpleName(), e);
         return new ErrorResponse(400, "Bad Request", e.getMessage());
     }
