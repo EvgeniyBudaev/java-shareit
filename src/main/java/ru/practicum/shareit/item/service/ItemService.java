@@ -10,10 +10,10 @@ public interface ItemService {
     /**
      * Реализует добавление Вещи в хранилище
      * @param userId идентификатор Пользователя владельца
-     * @param item Вещь
-     * @return объект Item
+     * @param itemDto Вещь
+     * @return объект ItemDto
      */
-    Item addItem(long userId, Item item);
+    ItemDto addItem(long userId, ItemDto itemDto);
 
     /**
      * Реализует обновление полей хранимой Вещи

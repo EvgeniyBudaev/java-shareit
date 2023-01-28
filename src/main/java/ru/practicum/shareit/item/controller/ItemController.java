@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
@@ -26,10 +27,10 @@ public class ItemController {
     private final String userIdHeader = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto addItem(@RequestHeader(userIdHeader) long userId, @Valid @RequestBody ItemDto itemDto) {
+    public ResponseEntity<ItemDto> addItem(@RequestHeader(userIdHeader) long userId, @Valid @RequestBody ItemDto itemDto) {
         Logger.logRequest(HttpMethod.POST, "/items", itemDto.toString());
-        Item item = itemMapper.convertFromDto(itemDto);
-        return itemMapper.convertToDto(itemService.addItem(userId, item));
+        ItemDto itemCreated = itemService.addItem(userId, itemDto);
+        return ResponseEntity.status(201).body(itemCreated);
     }
 
     @GetMapping("{itemId}")
@@ -67,7 +68,7 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public CommentDto addComment(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId,
-                              @RequestBody @Valid CommentDto commentDto) {
+                                 @RequestBody @Valid CommentDto commentDto) {
         Logger.logRequest(HttpMethod.POST, "/items/" + itemId + "/comment", commentDto.toString());
         Comment comment = commentMapper.convertFromDto(commentDto);
         return commentMapper.convertToDto(itemService.addComment(userId, itemId, comment));

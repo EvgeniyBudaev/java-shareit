@@ -41,12 +41,13 @@ public class ItemServiceImpl implements ItemService {
     private final CommentMapper commentMapper;
 
     @Override
-    public Item addItem(long userId, Item item) {
+    public ItemDto addItem(long userId, ItemDto itemDto) {
+        Item item = itemMapper.convertFromDto(itemDto);
         User user = userService.getUserById(userId);
         item.setUserId(user.getId());
         Item itemSaved = itemRepository.save(item);
         Logger.logSave(HttpMethod.POST, "/items", itemSaved.toString());
-        return itemSaved;
+        return itemMapper.convertToDto(itemSaved);
     }
 
     @Override
