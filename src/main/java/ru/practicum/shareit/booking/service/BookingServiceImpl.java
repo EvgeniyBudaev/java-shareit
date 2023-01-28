@@ -87,6 +87,19 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public BookingDto getBooking(long bookingId, long userId, AccessLevel accessLevel) {
+        User user = userService.getUserById(userId);
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(
+                () -> new ObjectNotFoundException(String.format("Бронирование с id %d не найдено", bookingId)));
+        if (isUnableToAccess(user.getId(), booking, accessLevel)) {
+            throw new AccessException(String.format("У пользователя с id %d нет прав на просмотр бронирования с id %d,",
+                    userId, bookingId));
+        }
+        Logger.logSave(HttpMethod.GET, "/bookings/" + bookingId, booking.toString());
+        return bookingMapper.convertToDto(booking);
+    }
+
+    @Override
     public List<BookingDto> getBookingsOfCurrentUser(State state, long bookerId) {
         User booker = userService.getUserById(bookerId);
         Sort sort = Sort.by(Sort.Direction.DESC, "start");

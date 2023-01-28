@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.model.AccessLevel;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInputDto;
-import ru.practicum.shareit.booking.mapper.BookingMapper;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.StateEnumConverter;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.logger.Logger;
@@ -21,7 +19,6 @@ import java.util.List;
 @AllArgsConstructor
 public class BookingController {
     private final BookingService bookingService;
-    private final BookingMapper bookingMapper;
     private final StateEnumConverter converter;
     private final String userIdHeader = "X-Sharer-User-Id";
 
@@ -40,10 +37,9 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")   // Получение данных о конкретном бронировании (включая его статус)
-    public BookingDto getBookingById(@PathVariable long bookingId, @RequestHeader(userIdHeader) long userId) {
+    public ResponseEntity<BookingDto> getBookingById(@PathVariable long bookingId, @RequestHeader(userIdHeader) long userId) {
         Logger.logRequest(HttpMethod.GET, "/bookings/" + bookingId, "no body");
-        Booking booking = bookingService.getBookingById(bookingId, userId, AccessLevel.OWNER_AND_BOOKER);
-        return bookingMapper.convertToDto(booking);
+        return ResponseEntity.ok().body(bookingService.getBooking(bookingId, userId, AccessLevel.OWNER_AND_BOOKER));
     }
 
     @GetMapping   // Получение списка всех бронирований текущего пользователя (можно делать выборку по статусу).
