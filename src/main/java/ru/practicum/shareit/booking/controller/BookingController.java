@@ -9,7 +9,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.shareit.booking.model.AccessLevel;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInputDto;
-import ru.practicum.shareit.booking.model.StateEnumConverter;
+import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.logger.Logger;
 
@@ -21,7 +21,6 @@ import java.util.List;
 @AllArgsConstructor
 public class BookingController {
     private final BookingService bookingService;
-    private final StateEnumConverter converter;
     private final String host = "localhost";
     private final String port = "8080";
     private final String protocol = "http";
@@ -77,7 +76,7 @@ public class BookingController {
                 .query("state={state}")
                 .build();
         Logger.logRequest(HttpMethod.GET, uriComponents.toUriString(), "no body");
-        return ResponseEntity.ok().body(bookingService.getBookingsOfCurrentUser(converter.convert(state), userId));
+        return ResponseEntity.ok().body(bookingService.getBookingsOfCurrentUser(State.convert(state), userId));
     }
 
     // Получение списка бронирований для всех вещей текущего пользователя-владельца (можно делать выборку по статусу)
@@ -92,6 +91,6 @@ public class BookingController {
                 .query("state={state}")
                 .build();
         Logger.logRequest(HttpMethod.GET, uriComponents.toUriString(), "no body");
-        return ResponseEntity.ok().body(bookingService.getBookingsOfOwner(converter.convert(state), userId));
+        return ResponseEntity.ok().body(bookingService.getBookingsOfOwner(State.convert(state), userId));
     }
 }
