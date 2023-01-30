@@ -1,52 +1,63 @@
 package ru.practicum.shareit.item.service;
 
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface ItemService {
     /**
-     * Возвращает DTO Вещи по идентификатору
-     * @param id идентификатор вещи
+     * Реализует добавление Вещи в хранилище
+     * @param userId идентификатор Пользователя владельца
+     * @param itemDto Вещь
+     * @return объект ItemDto
+     */
+    ItemDto addItem(long userId, ItemDto itemDto);
+
+    /**
+     * Реализует обновление полей хранимой Вещи
+     * @param userId идентификатор Пользователя владельца
+     * @param itemId идентификатор Вещи
+     * @param itemDto Вещь
+     * @return объект ItemDto
+     */
+    ItemDto updateItem(long userId, long itemId, ItemDto itemDto);
+
+    /**
+     * Возвращает ItemDto Вещи Пользователя
+     * @param itemId идентификатор Вещи
+     * @param userId идентификатор Пользователя владельца Вещи
      * @return ItemDto
      */
-    ItemDto getItem(Long id);
+    ItemDto getItemById(long itemId, long userId);
 
     /**
      * Возвращает коллекцию DTO Вещей Пользователя
      * @param userId идентификатор Пользователя владельца Вещи
      * @return коллекцию ItemDto
      */
-    List<ItemDto> getAllItemsByUserId(Long userId);
-
-    /**
-     * Реализует добавление Вещи в хранилище
-     * @param itemDto DTO объект Вещи
-     * @param ownerId идентификатор Пользователя владельца
-     * @return DTO добавленного объекта Item в хранилище
-     */
-    ItemDto createItem(ItemDto itemDto, Long ownerId);
-
-    /**
-     * Реализует обновление полей хранимой Вещи
-     * @param itemDto объект Вещи с изменениями
-     * @param itemId идентификатор Вещи
-     * @param userId идентификатор Пользователя
-     * @return DTO обновленного объекта Item
-     */
-    ItemDto updateItem(ItemDto itemDto, long itemId, long userId);
-
-    /**
-     * Реализует удаление Вещи из хранилища
-     * @param id идентификатор удаляемой вещи
-     */
-    void removeItem(Long id);
+    List<ItemDto> getAllItems(long userId);
 
     /**
      * Реализует поиск Вещей в хранилище по ключевому слову
-     * @param keyword ключевое слово для поиска
-     * @return коллекцию DTO объектов Item
+     * @param text ключевое слово для поиска
+     * @return коллекцию ItemDto
      */
-    Collection<ItemDto> searchItemsByDescription(String keyword);
+    List<ItemDto> searchItems(String text);
+
+    /**
+     * Реализует удаление Вещи из хранилища
+     * @param userId идентификатор Пользователя владельца Вещи
+     * @param itemId идентификатор удаляемой вещи
+     */
+    void removeItem(long userId, long itemId);
+
+    /**
+     * Реализует добавления Комментария
+     * @param userId идентификатор Пользователя владельца Вещи
+     * @param itemId идентификатор Вещи
+     * @param commentDto Комментарий
+     * @return CommentDto
+     */
+    CommentDto addComment(long userId, long itemId, CommentDto commentDto);
 }
