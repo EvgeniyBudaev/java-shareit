@@ -24,7 +24,6 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.logger.Logger;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,11 +32,10 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class BookingServiceImpl implements BookingService {
+    private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
-    private final UserService userService;
     private final UserRepository userRepository;
     private final BookingMapper bookingMapper;
-    private final BookingRepository bookingRepository;
     private final String host = "localhost";
     private final String port = "8080";
     private final String protocol = "http";
@@ -53,7 +51,8 @@ public class BookingServiceImpl implements BookingService {
                 .path("/bookings")
                 .build();
         Logger.logInfo(HttpMethod.POST, uriComponents.toUriString(), booking.toString());
-        User booker = userService.getUserById(bookerId);
+        User booker = userRepository.findById(bookerId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Пользователь с id %s не найден", bookerId)));
         Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Вещь с id %s не найдена", booking.getItem().getId())));
         validateAddBooking(bookerId, booking, item);
@@ -68,7 +67,8 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public BookingDto approveOrRejectBooking(long ownerId, long bookingId, boolean approved, AccessLevel accessLevel) {
-        User owner = userService.getUserById(ownerId);
+        User owner = userRepository.findById(ownerId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Пользователь с id %s не найден", ownerId)));
         Booking booking = getBookingById(bookingId, owner.getId(), accessLevel);
         if (booking.getStatus().equals(Status.APPROVED)) {
             throw new InvalidDataException(String.format("У бронирования с id %d уже стоит статус %s",
@@ -94,11 +94,12 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     @Override
     public Booking getBookingById(long bookingId, long userId, AccessLevel accessLevel) {
-        User user = userService.getUserById(userId);
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(
                 () -> new ObjectNotFoundException(String.format("Бронирование с id %d не найдено", bookingId)));
         if (isUnableToAccess(user.getId(), booking, accessLevel)) {
-            throw new AccessException(String.format("У пользователя с id %d нет прав на просмотр бронирования с id %d,",
+            throw new AccessException(String.format("У пользователя с id %d нет прав на просмотр бронирования с id %d",
                     userId, bookingId));
         }
         UriComponents uriComponents = UriComponentsBuilder.newInstance()
@@ -109,26 +110,6 @@ public class BookingServiceImpl implements BookingService {
                 .build();
         Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), booking.toString());
         return booking;
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public BookingDto getBooking(long bookingId, long userId, AccessLevel accessLevel) {
-        User user = userService.getUserById(userId);
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(
-                () -> new ObjectNotFoundException(String.format("Бронирование с id %d не найдено", bookingId)));
-        if (isUnableToAccess(user.getId(), booking, accessLevel)) {
-            throw new AccessException(String.format("У пользователя с id %d нет прав на просмотр бронирования с id %d,",
-                    userId, bookingId));
-        }
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/bookings/{bookingId}")
-                .build();
-        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), booking.toString());
-        return bookingMapper.convertToDto(booking);
     }
 
     @Transactional(readOnly = true)

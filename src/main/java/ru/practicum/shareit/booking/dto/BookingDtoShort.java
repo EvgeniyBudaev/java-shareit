@@ -17,3 +17,4 @@ public class BookingDtoShort {
     private LocalDateTime start;
     private LocalDateTime end;
 }
+

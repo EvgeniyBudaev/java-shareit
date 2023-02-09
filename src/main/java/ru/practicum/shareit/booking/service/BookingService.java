@@ -37,15 +37,6 @@ public interface BookingService {
     Booking getBookingById(long bookingId, long userId, AccessLevel accessLevel);
 
     /**
-     * Возвращает Бронирование по идентификатору
-     * @param bookingId идентификатор Брони
-     * @param userId идентификатор пользователя
-     * @param accessLevel уровень доступа
-     * @return BookingDto
-     */
-    BookingDto getBooking(long bookingId, long userId, AccessLevel accessLevel);
-
-    /**
      * Возвращает коллекцию Booking для текущего Пользователя
      * @param state состояние
      * @param bookerId идентификатор

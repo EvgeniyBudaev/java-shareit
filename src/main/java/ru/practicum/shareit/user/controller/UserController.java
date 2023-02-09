@@ -33,7 +33,7 @@ public class UserController {
                 .path("/users")
                 .build();
         Logger.logRequest(HttpMethod.POST, uriComponents.toUriString(), userDto.toString());
-        return ResponseEntity.status(201).body(userService.addUser(userDto));
+        return ResponseEntity.status(200).body(userService.addUser(userDto));
     }
 
     @GetMapping("{userId}")
@@ -45,7 +45,7 @@ public class UserController {
                 .path("/users/{userId}")
                 .build();
         Logger.logRequest(HttpMethod.GET, uriComponents.toUriString(), "пусто");
-        return ResponseEntity.ok().body(userService.getUser(userId));
+        return ResponseEntity.ok().body(userService.getUserById(userId));
     }
 
     @GetMapping

@@ -26,16 +26,9 @@ public interface UserService {
     /**
      * Возвращает Пользователя по идентификатору
      * @param userId идентификатор пользователя
-     * @return User
-     */
-    User getUserById(long userId);
-
-    /**
-     * Возвращает Пользователя по идентификатору
-     * @param userId идентификатор пользователя
      * @return UserDto
      */
-    UserDto getUser(long userId);
+    UserDto getUserById(long userId);
 
     /**
      * Возвращает коллекцию Пользователей

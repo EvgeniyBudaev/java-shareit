@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final String host = "localhost";
     private final String port = "8080";
     private final String protocol = "http";
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
                     .build();
             Logger.logSave(HttpMethod.POST, uriComponents.toUriString(), userSaved.toString());
             return userMapper.convertToDto(userSaved);
-        } catch (DataExistException e) {
+        } catch (RuntimeException e) {
             throw new DataExistException(String.format("Пользователь с email %s уже есть в базе", user.getEmail()));
         }
 
@@ -49,10 +49,11 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public  UserDto updateUser(long id, UserDto userDto) {
+    public UserDto updateUser(long id, UserDto userDto) {
         User user = userMapper.convertFromDto(userDto);
         try {
-            User targetUser = getUserById(id);
+            User targetUser = userRepository.findById(id).orElseThrow(() ->
+                    new ObjectNotFoundException(String.format("Пользователь с id %s не найден", id)));
             if (StringUtils.hasLength(user.getEmail())) {
                 targetUser.setEmail(user.getEmail());
             }
@@ -68,29 +69,14 @@ public class UserServiceImpl implements UserService {
                     .build();
             Logger.logSave(HttpMethod.PATCH, uriComponents.toUriString(), userSaved.toString());
             return userMapper.convertToDto(userSaved);
-        } catch (DataExistException e) {
+        } catch (RuntimeException e) {
             throw new DataExistException(String.format("Пользователь с email %s уже есть в базе", user.getEmail()));
         }
     }
 
     @Transactional(readOnly = true)
     @Override
-    public User getUserById(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/users/{userId}")
-                .build();
-        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), user.toString());
-        return user;
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public UserDto getUser(long userId) {
+    public UserDto getUserById(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
         UriComponents uriComponents = UriComponentsBuilder.newInstance()

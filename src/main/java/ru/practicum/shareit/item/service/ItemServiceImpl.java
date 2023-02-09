@@ -26,9 +26,10 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.logger.Logger;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserService;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -40,13 +41,14 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
-    private final UserService userService;
-    private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final ItemMapper itemMapper;
     private final BookingMapper bookingMapper;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
+    private final ItemRequestRepository itemRequestRepository;
+    private final UserRepository userRepository;
+
     private final String host = "localhost";
     private final String port = "8080";
     private final String protocol = "http";
@@ -54,9 +56,12 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public ItemDto addItem(long userId, ItemDto itemDto) {
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
         Item item = itemMapper.convertFromDto(itemDto);
-        User user = userService.getUserById(userId);
+        ItemRequest itemRequest = itemRequestRepository.findById(itemDto.getRequestId()).orElse(null);
         item.setUserId(user.getId());
+        item.setRequest(itemRequest);
         Item itemSaved = itemRepository.save(item);
         UriComponents uriComponents = UriComponentsBuilder.newInstance()
                 .scheme(protocol)
@@ -72,7 +77,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
         Item item = itemMapper.convertFromDto(itemDto);
-        User user = userService.getUserById(userId);
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
         Item targetItem = itemRepository.findById(itemId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Вещь с id %s не найдена", itemId)));
         if (targetItem.getUserId() != user.getId()) {
@@ -103,7 +109,8 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     @Override
     public ItemDto getItemById(long itemId, long userId) {
-        userService.getUserById(userId);
+        userRepository.findById(userId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Вещь с id %s не найдена", itemId)));
         ItemDto itemDto = itemMapper.convertToDto(item);
@@ -179,7 +186,8 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public void removeItem(long userId, long itemId) {
-        userService.getUserById(userId);
+        userRepository.findById(userId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Вещь с id %s не найдена", itemId)));
         itemRepository.deleteById(item.getId());
@@ -196,12 +204,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public CommentDto addComment(long userId, long itemId, CommentDto commentDto) {
         Comment comment = commentMapper.convertFromDto(commentDto);
-        User user = userService.getUserById(userId);
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ObjectNotFoundException(
                 String.format("Вещь с id %s не найдена", itemId)));
         List<Booking> bookings = bookingRepository.findAllByItemIdAndBookerIdAndStatus(itemId, userId, Status.APPROVED,
                 Sort.by(Sort.Direction.DESC, "start")).orElseThrow(() -> new ObjectNotFoundException(
-                                String.format("Пользователь с id %d не арендовал вещь с id %d.", userId, itemId)));
+                String.format("Пользователь с id %d не арендовал вещь с id %d.", userId, itemId)));
         Logger.logInfo(HttpMethod.POST, "/items/" + itemId + "/comment", bookings.toString());
         bookings.stream().filter(booking -> booking.getEnd().isBefore(LocalDateTime.now())).findAny().orElseThrow(() ->
                 new ObjectNotAvailableException(String.format("Пользователь с id %d не может оставлять комментарии вещи " +

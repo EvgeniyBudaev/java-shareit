@@ -36,7 +36,7 @@ public class ItemController {
                 .path("/items")
                 .build();
         Logger.logRequest(HttpMethod.POST, uriComponents.toUriString(), itemDto.toString());
-        return ResponseEntity.status(201).body(itemService.addItem(userId, itemDto));
+        return ResponseEntity.status(200).body(itemService.addItem(userId, itemDto));
     }
 
     @GetMapping("{itemId}")
