@@ -1,40 +1,44 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.request.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.Hibernate;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 
+/**
+ * TODO Sprint add-item-requests.
+ */
 @Getter
 @Setter
+@RequiredArgsConstructor
 @Entity
-@Table(name = "comments")
-public class Comment {
+@Table(name = "requests")
+public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id")
+    @Column(name = "request_id")
     private Long id;
     @Column(nullable = false, length = 500)
-    private String text;
+    private String description;
     @ManyToOne
-    @JoinColumn(name = "item_id")
-    private Item item;
-    @ManyToOne
-    @JoinColumn(name = "author_id")
-    private User author;
+    @JoinColumn(name = "requester_id")
+    private User requester;
     @Column
     private LocalDateTime created;
+    @OneToMany(mappedBy = "request", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<Item> items;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Comment comment = (Comment) o;
-        return id != null && Objects.equals(id, comment.id);
+        ItemRequest that = (ItemRequest) o;
+        return id != null && Objects.equals(id, that.id);
     }
 
     @Override

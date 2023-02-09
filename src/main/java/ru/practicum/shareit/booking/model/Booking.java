@@ -1,51 +1,53 @@
 package ru.practicum.shareit.booking.model;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import org.hibernate.Hibernate;
+import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Entity
-@Table(name = "bookings")
+/**
+ * TODO Sprint add-bookings.
+ */
 @Getter
 @Setter
-@ToString
+@Entity
+@RequiredArgsConstructor
+@Table(name = "bookings")
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
-    @ToString.Exclude
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "booking_id")
+    private Long id;
+    @Column(name = "start_date", nullable = false)
+    private LocalDateTime start;
+    @Column(name = "end_date", nullable = false)
+    private LocalDateTime end;
+    @ManyToOne
     @JoinColumn(name = "item_id")
     private Item item;
-
-    @ToString.Exclude
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "booker_id")
     private User booker;
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
     private Status status;
 
-    @Column(name = "start_booking")
-    private LocalDateTime start;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Booking booking = (Booking) o;
+        return id != null && Objects.equals(id, booking.id);
+    }
 
-    @Column(name = "end_booking")
-    private LocalDateTime end;
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

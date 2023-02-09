@@ -1,5 +1,2 @@
-# ShareIt
-Сервис для шеринга (от англ. share — «делиться») вещей.
-
-**Структура базы данных**
-![](images/ShareIt.png)
+# java-shareit
+Template repository for Shareit project.
