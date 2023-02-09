@@ -1,9 +1,20 @@
 package ru.practicum.shareit.item.model;
-import lombok.*;
-import org.hibernate.Hibernate;
-import ru.practicum.shareit.user.model.User;
-import javax.persistence.*;
-import java.util.Objects;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import ru.practicum.shareit.request.model.ItemRequest;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Getter
 @Setter
@@ -13,32 +24,24 @@ import java.util.Objects;
 @Entity
 @Table(name = "items")
 public class Item {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long id;
-   @Column(name = "name", nullable = false)
-   private String name;
-   @Column(name = "description", nullable = false)
-   private String description;
-   @Column(name = "is_available", nullable = false)
-   private Boolean available;
-   @ManyToOne
-   @JoinColumn(name = "owner_id", referencedColumnName = "id")
-   private User owner;
-   @Column(name = "request_id")
-   private Long requestId;
+    @Column(name = "user_id", nullable = false)
+    private long userId;
 
-   @Override
-   public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-      Item item = (Item) o;
-      return id != null && Objects.equals(id, item.id);
-   }
+    @Column(nullable = false)
+    private String name;
 
-   @Override
-   public int hashCode() {
-      return getClass().hashCode();
-   }
+    @Column(nullable = false, length = 1000)
+    private String description;
+
+    @Column(nullable = false)
+    private Boolean available;
+
+    @ToString.Exclude
+    @ManyToOne
+    @JoinColumn(name = "request_id")
+    private ItemRequest request;
 }
