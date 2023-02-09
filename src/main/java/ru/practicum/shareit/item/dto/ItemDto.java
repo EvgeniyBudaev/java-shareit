@@ -1,26 +1,29 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.shareit.booking.dto.BookingDtoShort;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ItemDto {
-    @Pattern(regexp = "^[^ ].*[^ ]$", message = "Неккоректное имя")
-    @Size(max = 255)
-    @NotNull(message = "Поле name обязательно")
+    private long id;
+    @NotBlank(message = "Поле с именем не должно быть пустым.")
     private String name;
-    @Pattern(regexp = "^[^ ].*[^ ]$", message = "Неккоректное описание")
-    @Size(max = 500)
-    @NotNull(message = "Поле description обязательно")
+    @NotBlank(message = "Поле с описанием не должно быть пустым.")
     private String description;
-    @NotNull(message = "Поле available обязательно")
+    @NotNull(message = "Поле Available не должно быть пустым.")
     private Boolean available;
-    @Min(1)
-    private Long requestId;
+    private BookingDtoShort lastBooking;
+    private BookingDtoShort nextBooking;
+    private List<CommentDto> comments;
+    private long requestId;
 }
