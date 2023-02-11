@@ -36,7 +36,7 @@ class ItemServiceTest {
     private ItemRepository mockItemRepository;
     @Mock
     private BookingRepository mockBookingRepository;
-    private final ItemMapper itemMapper = new ItemMapper();
+    private ItemMapper itemMapper;
     private final BookingMapper bookingMapper = new BookingMapper();
     @Mock
     private CommentRepository mockCommentRepository;

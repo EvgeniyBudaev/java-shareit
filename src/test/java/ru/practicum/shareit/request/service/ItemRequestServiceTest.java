@@ -31,11 +31,11 @@ class ItemRequestServiceTest {
     private ItemRequestService itemRequestService;
     private User user;
     private ItemRequestDto itemRequestDto;
+    private ItemMapper itemMapper;
 
     @BeforeEach
     void beforeEach() {
         ItemRequestMapper itemRequestMapper = new ItemRequestMapper();
-        ItemMapper itemMapper = new ItemMapper();
         itemRequestService = new ItemRequestServiceImpl(mockItemRequestRepository, itemRequestMapper,
                 mockItemRepository, itemMapper, mockUserRepository);
         user = User.builder()
