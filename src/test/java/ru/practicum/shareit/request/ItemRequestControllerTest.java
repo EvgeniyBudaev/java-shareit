@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.request.dto.*;
+import ru.practicum.shareit.request.service.ItemRequestService;
 
 import java.time.LocalDateTime;
 import java.util.List;

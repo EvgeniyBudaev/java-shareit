@@ -23,6 +23,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserDtoResponse;
 import ru.practicum.shareit.user.dto.UserDtoUpdate;
 import ru.practicum.shareit.user.dto.UserListDto;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
 
