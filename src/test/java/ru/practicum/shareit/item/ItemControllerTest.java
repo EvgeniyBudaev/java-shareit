@@ -34,6 +34,7 @@ public class ItemControllerTest {
     private ItemDto item1;
     private ItemDtoResponse itemDtoResponse;
     private ItemDtoUpdate itemDtoUpdate;
+    private final String userIdHeader = "X-Sharer-User-Id";
 
     @BeforeEach
     public void setUp() {
@@ -61,7 +62,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         post("/items")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -78,7 +79,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         post("/items")
-                                .header("X-Sharer-User-Id", 0)
+                                .header(userIdHeader, 0)
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -97,7 +98,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         post("/items")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -116,7 +117,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         post("/items")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -135,7 +136,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         post("/items")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -154,7 +155,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         post("/items")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -175,7 +176,7 @@ public class ItemControllerTest {
         when(itemService.updateItem(anyLong(), anyLong(), any(ItemDtoUpdate.class))).thenReturn(itemDtoResponse);
         mvc.perform(
                         patch("/items/1")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -192,7 +193,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         patch("/items/1")
-                                .header("X-Sharer-User-Id", 0)
+                                .header(userIdHeader, 0)
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -209,7 +210,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         patch("/items/0")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -228,7 +229,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         patch("/items/0")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -247,7 +248,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         patch("/items/0")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -265,7 +266,7 @@ public class ItemControllerTest {
         when(itemService.getItemByItemId(anyLong(), anyLong())).thenReturn(itemDtoResponse);
         mvc.perform(
                 get("/items/1")
-                        .header("X-Sharer-User-Id", 1))
+                        .header(userIdHeader, 1))
                 .andDo(print())
                 //then
                 .andExpectAll(
@@ -280,7 +281,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         get("/items/1")
-                                .header("X-Sharer-User-Id", 0))
+                                .header(userIdHeader, 0))
                 .andDo(print())
                 //then
                 .andExpectAll(
@@ -295,7 +296,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         get("/items/0")
-                                .header("X-Sharer-User-Id", 1))
+                                .header(userIdHeader, 1))
                 .andDo(print())
                 //then
                 .andExpectAll(
@@ -330,7 +331,7 @@ public class ItemControllerTest {
                         get("/items")
                                 .param("from","0")
                                 .param("size","1")
-                                .header("X-Sharer-User-Id", 0))
+                                .header(userIdHeader, 0))
                 .andExpectAll(
                         status().isBadRequest()
                 );
@@ -345,7 +346,7 @@ public class ItemControllerTest {
                         get("/items")
                                 .param("from","-1")
                                 .param("size","1")
-                                .header("X-Sharer-User-Id", 1))
+                                .header(userIdHeader, 1))
                 .andExpectAll(
                         status().isBadRequest()
                 );
@@ -360,7 +361,7 @@ public class ItemControllerTest {
                         get("/items")
                                 .param("from","0")
                                 .param("size","99999")
-                                .header("X-Sharer-User-Id", 1))
+                                .header(userIdHeader, 1))
                 .andExpectAll(
                         status().isBadRequest()
                 );
@@ -432,7 +433,7 @@ public class ItemControllerTest {
         when(itemService.addComment(anyLong(), anyLong(), any(CommentDto.class))).thenReturn(commentDtoResponse);
         mvc.perform(
                 post("/items/1/comment")
-                        .header("X-Sharer-User-Id", 1)
+                        .header(userIdHeader, 1)
                         .content(objectMapper.writeValueAsString(comment))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -453,7 +454,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         post("/items/1/comment")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .content(objectMapper.writeValueAsString(comment))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -474,7 +475,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         post("/items/0/comment")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .content(objectMapper.writeValueAsString(comment))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -495,7 +496,7 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         post("/items/1/comment")
-                                .header("X-Sharer-User-Id", 0)
+                                .header(userIdHeader, 0)
                                 .content(objectMapper.writeValueAsString(comment))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())

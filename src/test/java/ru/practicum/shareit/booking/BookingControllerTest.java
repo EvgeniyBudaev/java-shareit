@@ -44,6 +44,7 @@ public class BookingControllerTest {
     private static UserShortDto userShortDto;
     private BookingListDto bookingListDto;
     private static BookingDtoResponse bookingDtoResponse;
+    private final String userIdHeader = "X-Sharer-User-Id";
 
     @BeforeAll
     public static void setUp() {
@@ -79,7 +80,7 @@ public class BookingControllerTest {
                 post("/bookings")
                         .content(objectMapper.writeValueAsString(bookingDto))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
+                        .header(userIdHeader, 1))
                 .andDo(print())
                 //then
                 .andExpectAll(
@@ -96,7 +97,7 @@ public class BookingControllerTest {
                         post("/bookings")
                                 .content(objectMapper.writeValueAsString(bookingDto))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", 0))
+                                .header(userIdHeader, 0))
                 .andDo(print())
                 //then
                 .andExpectAll(
@@ -115,7 +116,7 @@ public class BookingControllerTest {
                         post("/bookings")
                                 .content(objectMapper.writeValueAsString(bookingDto))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", 1))
+                                .header(userIdHeader, 1))
                 .andDo(print())
                 //then
                 .andExpectAll(
@@ -135,7 +136,7 @@ public class BookingControllerTest {
                         post("/bookings")
                                 .content(objectMapper.writeValueAsString(bookingDto))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", 1))
+                                .header(userIdHeader, 1))
                 .andDo(print())
                 //then
                 .andExpectAll(
@@ -155,7 +156,7 @@ public class BookingControllerTest {
                         post("/bookings")
                                 .content(objectMapper.writeValueAsString(bookingDto))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", 1))
+                                .header(userIdHeader, 1))
                 .andDo(print())
                 //then
                 .andExpectAll(
@@ -174,7 +175,7 @@ public class BookingControllerTest {
         when(bookingService.approveBooking(anyLong(), anyLong(), anyString())).thenReturn(bookingDtoResponse);
         mvc.perform(
                 (patch("/bookings/1"))
-                        .header("X-Sharer-User-Id", 1)
+                        .header(userIdHeader, 1)
                         .param("approved", "true"))
                 .andDo(print())
                 //then
@@ -191,7 +192,7 @@ public class BookingControllerTest {
         //when
         mvc.perform(
                         (patch("/bookings/1"))
-                                .header("X-Sharer-User-Id", 0)
+                                .header(userIdHeader, 0)
                                 .param("approved", "true"))
                 .andDo(print())
                 //then
@@ -207,7 +208,7 @@ public class BookingControllerTest {
         //when
         mvc.perform(
                         (patch("/bookings/0"))
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("approved", "true"))
                 .andDo(print())
                 //then
@@ -224,7 +225,7 @@ public class BookingControllerTest {
         when(bookingService.getBookingByIdForOwnerAndBooker(anyLong(), anyLong())).thenReturn(bookingDtoResponse);
         mvc.perform(
                 get("/bookings/1")
-                        .header("X-Sharer-User-Id", 1))
+                        .header(userIdHeader, 1))
                 .andDo(print())
                 //then
                 .andExpectAll(
@@ -239,7 +240,7 @@ public class BookingControllerTest {
         //when
         mvc.perform(
                         get("/bookings/0")
-                                .header("X-Sharer-User-Id", 1))
+                                .header(userIdHeader, 1))
                 .andDo(print())
                 .andExpectAll(
                         //then
@@ -274,7 +275,7 @@ public class BookingControllerTest {
                 .thenReturn(bookingListDto);
         mvc.perform(
                 get("/bookings")
-                        .header("X-Sharer-User-Id", 1)
+                        .header(userIdHeader, 1)
                         .param("from", "0")
                         .param("size", "2"))
                 .andDo(print())
@@ -297,7 +298,7 @@ public class BookingControllerTest {
                 .thenThrow(StateException.class);
         mvc.perform(
                         get("/bookings")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "0")
                                 .param("size", "2")
                                 .param("state", "qwe"))
@@ -314,7 +315,7 @@ public class BookingControllerTest {
         //when
         mvc.perform(
                         get("/bookings")
-                                .header("X-Sharer-User-Id", 0)
+                                .header(userIdHeader, 0)
                                 .param("from", "0")
                                 .param("size", "2"))
                 .andDo(print())
@@ -332,7 +333,7 @@ public class BookingControllerTest {
         //when
         mvc.perform(
                         get("/bookings")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "-1")
                                 .param("size", "2"))
                 .andDo(print())
@@ -350,7 +351,7 @@ public class BookingControllerTest {
         //when
         mvc.perform(
                         get("/bookings")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "0")
                                 .param("size", "10000"))
                 .andDo(print())
@@ -374,7 +375,7 @@ public class BookingControllerTest {
                 .thenReturn(bookingListDto);
         mvc.perform(
                         get("/bookings/owner")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "0")
                                 .param("size", "2"))
                 .andDo(print())
@@ -391,7 +392,7 @@ public class BookingControllerTest {
         //when
         mvc.perform(
                         get("/bookings")
-                                .header("X-Sharer-User-Id", 0)
+                                .header(userIdHeader, 0)
                                 .param("from", "0")
                                 .param("size", "2"))
                 .andDo(print())
@@ -409,7 +410,7 @@ public class BookingControllerTest {
         //when
         mvc.perform(
                         get("/bookings/owner")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "-1")
                                 .param("size", "2"))
                 .andDo(print())
@@ -427,7 +428,7 @@ public class BookingControllerTest {
         //when
         mvc.perform(
                         get("/bookings/owner")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "0")
                                 .param("size", "10000"))
                 .andDo(print())

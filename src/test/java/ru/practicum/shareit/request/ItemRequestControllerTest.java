@@ -37,6 +37,7 @@ public class ItemRequestControllerTest {
     private ItemRequestListDto itemRequestListDto;
     private RequestDtoResponseWithMD requestDtoResponseWithMD;
     private ItemDataForRequestDto itemDataForRequestDto;
+    private final String userIdHeader = "X-Sharer-User-Id";
 
     @BeforeEach
     public void setUp() {
@@ -70,7 +71,7 @@ public class ItemRequestControllerTest {
                 .thenReturn(itemRequestDtoResponse);
         mvc.perform(
                         post("/requests")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .content(objectMapper.writeValueAsString(itemRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())
@@ -87,7 +88,7 @@ public class ItemRequestControllerTest {
         //when
         mvc.perform(
                         post("/requests")
-                                .header("X-Sharer-User-Id", 0)
+                                .header(userIdHeader, 0)
                                 .content(objectMapper.writeValueAsString(itemRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())
@@ -106,7 +107,7 @@ public class ItemRequestControllerTest {
         //when
         mvc.perform(
                         post("/requests")
-                                .header("X-Sharer-User-Id", 0)
+                                .header(userIdHeader, 0)
                                 .content(objectMapper.writeValueAsString(itemRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())
@@ -129,7 +130,7 @@ public class ItemRequestControllerTest {
         when(itemRequestService.getPrivateRequests(any(PageRequest.class), anyLong())).thenReturn(itemRequestListDto);
         mvc.perform(
                         get("/requests")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "0")
                                 .param("size", "2")
                 ).andDo(print())
@@ -145,7 +146,7 @@ public class ItemRequestControllerTest {
         //when
         mvc.perform(
                         get("/requests")
-                                .header("X-Sharer-User-Id", 0)
+                                .header(userIdHeader, 0)
                                 .param("from", "0")
                                 .param("size", "2")
                 ).andDo(print())
@@ -161,7 +162,7 @@ public class ItemRequestControllerTest {
         //when
         mvc.perform(
                         get("/requests")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "-1")
                                 .param("size", "2")
                 ).andDo(print())
@@ -177,7 +178,7 @@ public class ItemRequestControllerTest {
         //when
         mvc.perform(
                         get("/requests")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "0")
                                 .param("size", "-1")
                 ).andDo(print())
@@ -199,7 +200,7 @@ public class ItemRequestControllerTest {
         when(itemRequestService.getOtherRequests(any(PageRequest.class), anyLong())).thenReturn(itemRequestListDto);
         mvc.perform(
                         get("/requests/all")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "0")
                                 .param("size", "2")
                 ).andDo(print())
@@ -215,7 +216,7 @@ public class ItemRequestControllerTest {
         //when
         mvc.perform(
                         get("/requests/all")
-                                .header("X-Sharer-User-Id", 0)
+                                .header(userIdHeader, 0)
                                 .param("from", "0")
                                 .param("size", "2")
                 ).andDo(print())
@@ -232,7 +233,7 @@ public class ItemRequestControllerTest {
         //when
         mvc.perform(
                         get("/requests/all")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "-1")
                                 .param("size", "2")
                 ).andDo(print())
@@ -249,7 +250,7 @@ public class ItemRequestControllerTest {
         //when
         mvc.perform(
                         get("/requests/all")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "0")
                                 .param("size", "24343")
                 ).andDo(print())
@@ -269,7 +270,7 @@ public class ItemRequestControllerTest {
         when(itemRequestService.getItemRequest(anyLong(), anyLong())).thenReturn(requestDtoResponseWithMD);
         mvc.perform(
                         get("/requests/1")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                 ).andDo(print())
                 .andExpectAll(
                         status().isOk(),
@@ -283,7 +284,7 @@ public class ItemRequestControllerTest {
         //when
         mvc.perform(
                         get("/requests/1")
-                                .header("X-Sharer-User-Id", 0)
+                                .header(userIdHeader, 0)
                 ).andDo(print())
                 .andExpectAll(
                         //then
@@ -298,7 +299,7 @@ public class ItemRequestControllerTest {
         //when
         mvc.perform(
                         get("/requests/0")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                 ).andDo(print())
                 .andExpectAll(
                         //then
