@@ -18,18 +18,16 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @RestController
 @RequestMapping("/requests")
 @Validated
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
+    private final String userIdHeader = "X-Sharer-User-Id";
 
     @PostMapping
-    public ResponseEntity<ItemRequestDtoResponse> createRequest(@RequestHeader("X-Sharer-User-Id") @Min(1) Long requesterId,
+    public ResponseEntity<ItemRequestDtoResponse> createRequest(@RequestHeader(userIdHeader) @Min(1) Long requesterId,
                                                                 @RequestBody @Valid ItemRequestDto itemRequestDto) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(itemRequestService.createItemRequest(itemRequestDto, requesterId));
@@ -37,7 +35,7 @@ public class ItemRequestController {
 
     @GetMapping
     public ResponseEntity<ItemRequestListDto> getPrivateRequests(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long requesterId,
+            @RequestHeader(userIdHeader) @Min(1) Long requesterId,
             @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -48,7 +46,7 @@ public class ItemRequestController {
 
     @GetMapping("all")
     public ResponseEntity<ItemRequestListDto> getOtherRequests(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long requesterId,
+            @RequestHeader(userIdHeader) @Min(1) Long requesterId,
             @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -60,7 +58,7 @@ public class ItemRequestController {
 
     @GetMapping("{requestId}")
     public ResponseEntity<RequestDtoResponseWithMD> getItemRequest(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+            @RequestHeader(userIdHeader) @Min(1) Long userId,
             @PathVariable @Min(1) Long requestId) {
         return ResponseEntity.status(HttpStatus.OK).body(itemRequestService.getItemRequest(userId, requestId));
     }

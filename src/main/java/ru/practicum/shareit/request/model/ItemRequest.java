@@ -1,6 +1,8 @@
 package ru.practicum.shareit.request.model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.hibernate.Hibernate;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -10,9 +12,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @Getter
 @Setter
 @RequiredArgsConstructor

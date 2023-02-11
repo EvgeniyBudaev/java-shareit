@@ -16,9 +16,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
-/**
- * TODO Sprint add-bookings.
- */
 @RestController
 @RequestMapping("/bookings")
 @Validated
@@ -26,15 +23,16 @@ import javax.validation.constraints.Min;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final String userIdHeader = "X-Sharer-User-Id";
 
     @PostMapping
-    public ResponseEntity<BookingDtoResponse> createBooking(@RequestHeader("X-Sharer-User-Id") @Min(1) Long bookerId,
+    public ResponseEntity<BookingDtoResponse> createBooking(@RequestHeader(userIdHeader) @Min(1) Long bookerId,
                                                             @Valid @RequestBody BookingDto bookingDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.createBooking(bookerId, bookingDto));
     }
 
     @PatchMapping("{bookingId}")
-    public ResponseEntity<BookingDtoResponse> approveBooking(@RequestHeader("X-Sharer-User-Id") @Min(1) Long ownerId,
+    public ResponseEntity<BookingDtoResponse> approveBooking(@RequestHeader(userIdHeader) @Min(1) Long ownerId,
                                                              @RequestParam String approved,
                                                              @PathVariable @Min(1) Long bookingId) {
         return ResponseEntity.status(HttpStatus.OK).body(bookingService.approveBooking(ownerId, bookingId, approved));
@@ -43,14 +41,14 @@ public class BookingController {
     @GetMapping("{bookingId}")
     public ResponseEntity<BookingDtoResponse> getBookingByIdForOwnerAndBooker(
             @PathVariable @Min(1) Long bookingId,
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId) {
+            @RequestHeader(userIdHeader) @Min(1) Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(bookingService.getBookingByIdForOwnerAndBooker(bookingId, userId));
     }
 
     @GetMapping
     public ResponseEntity<BookingListDto> getAllBookingsForUser(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+            @RequestHeader(userIdHeader) @Min(1) Long userId,
             @RequestParam(defaultValue = "ALL") String state,
             @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {
@@ -60,7 +58,7 @@ public class BookingController {
 
     @GetMapping("owner")
     public ResponseEntity<BookingListDto> getAllBookingsForItemsUser(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+            @RequestHeader(userIdHeader) @Min(1) Long userId,
             @RequestParam(defaultValue = "ALL") String state,
             @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {

@@ -73,7 +73,7 @@ public class ItemServiceImpl implements ItemService {
             itemDtoResponse.setLastBooking(mapper
                     .mapToBookingShortDto(bookings
                             .findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(
-                                    itemId, LocalDateTime.now(), Status.APPROVED).orElse(null) //я переделал на optional но тут нужен конкретно null при отсутсвии букинга
+                                    itemId, LocalDateTime.now(), Status.APPROVED).orElse(null)
                     ));
             itemDtoResponse.setNextBooking(mapper.mapToBookingShortDto(bookings
                     .findFirstByItemIdAndStartAfterAndStatusOrderByStartAsc(

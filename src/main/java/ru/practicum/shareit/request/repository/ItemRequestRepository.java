@@ -6,7 +6,6 @@ import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
 
-
 public interface ItemRequestRepository extends PagingAndSortingRepository<ItemRequest, Long> {
     List<ItemRequest> findAllByRequesterId(Pageable pageable, Long requesterId);
 

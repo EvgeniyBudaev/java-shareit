@@ -12,7 +12,6 @@ public interface ItemMapper {
     @Mapping(source = "request.id", target = "requestId")
     ItemDtoResponse mapToItemDtoResponse(Item item);
 
-    //@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Item mapToItemFromItemDto(ItemDto itemDto);
 
     @Mapping(source = "booker.id", target = "bookerId")

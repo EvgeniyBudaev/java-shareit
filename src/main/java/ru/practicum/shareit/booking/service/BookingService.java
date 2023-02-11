@@ -5,7 +5,6 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.dto.BookingListDto;
 
-
 public interface BookingService {
 
     BookingDtoResponse createBooking(Long bookerId, BookingDto bookingDto);
