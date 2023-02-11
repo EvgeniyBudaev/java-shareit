@@ -3,10 +3,7 @@ package ru.practicum.shareit.user.service;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.shareit.exception.DataExistException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.logger.Logger;
@@ -23,31 +20,19 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final String host = "localhost";
-    private final String port = "8080";
-    private final String protocol = "http";
 
-    @Transactional
     @Override
     public UserDto addUser(UserDto userDto) {
         User user = userMapper.convertFromDto(userDto);
         try {
             User userSaved = userRepository.save(user);
-            UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                    .scheme(protocol)
-                    .host(host)
-                    .port(port)
-                    .path("/users")
-                    .build();
-            Logger.logSave(HttpMethod.POST, uriComponents.toUriString(), userSaved.toString());
+            Logger.logSave(HttpMethod.POST, "/users", userSaved.toString());
             return userMapper.convertToDto(userSaved);
         } catch (RuntimeException e) {
             throw new DataExistException(String.format("Пользователь с email %s уже есть в базе", user.getEmail()));
         }
-
     }
 
-    @Transactional
     @Override
     public UserDto updateUser(long id, UserDto userDto) {
         User user = userMapper.convertFromDto(userDto);
@@ -61,52 +46,30 @@ public class UserServiceImpl implements UserService {
                 targetUser.setName(user.getName());
             }
             User userSaved = userRepository.save(targetUser);
-            UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                    .scheme(protocol)
-                    .host(host)
-                    .port(port)
-                    .path("/users/{id}")
-                    .build();
-            Logger.logSave(HttpMethod.PATCH, uriComponents.toUriString(), userSaved.toString());
+            Logger.logSave(HttpMethod.PATCH, "/users/" + id, userSaved.toString());
             return userMapper.convertToDto(userSaved);
         } catch (RuntimeException e) {
             throw new DataExistException(String.format("Пользователь с email %s уже есть в базе", user.getEmail()));
         }
     }
 
-    @Transactional(readOnly = true)
     @Override
     public UserDto getUserById(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Пользователь с id %s не найден", userId)));
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/users/{userId}")
-                .build();
-        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), user.toString());
+        Logger.logSave(HttpMethod.GET, "/users/" + userId, user.toString());
         return userMapper.convertToDto(user);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/users")
-                .build();
-        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), users.toString());
-        return users
-                .stream()
+        Logger.logSave(HttpMethod.GET, "/users", users.toString());
+        return users.stream()
                 .map(userMapper::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     @Override
     public void removeUser(long id) {
         userRepository.deleteById(id);

@@ -5,12 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
-import ru.practicum.shareit.booking.mapper.BookingMapperImpl;
 import ru.practicum.shareit.booking.model.AccessLevel;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
@@ -19,22 +16,18 @@ import ru.practicum.shareit.exception.AccessException;
 import ru.practicum.shareit.exception.InvalidDataException;
 import ru.practicum.shareit.exception.ObjectNotAvailableException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
-import ru.practicum.shareit.item.mapper.ItemMapperImpl;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.mapper.UserMapperImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {BookingMapperImpl.class, UserMapperImpl.class, ItemMapperImpl.class})
+@ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
     @Mock
     private BookingRepository mockBookingRepository;
@@ -42,8 +35,7 @@ class BookingServiceTest {
     private ItemRepository mockItemRepository;
     @Mock
     private UserRepository mockUserRepository;
-    @Autowired
-    private BookingMapper bookingMapper;
+    private final BookingMapper bookingMapper = new BookingMapper();
     private BookingService bookingService;
     private User user;
     private Item item;

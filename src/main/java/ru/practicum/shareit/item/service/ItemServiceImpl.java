@@ -7,9 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.shareit.booking.dto.BookingDtoShort;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -49,11 +46,6 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
 
-    private final String host = "localhost";
-    private final String port = "8080";
-    private final String protocol = "http";
-
-    @Transactional
     @Override
     public ItemDto addItem(long userId, ItemDto itemDto) {
         User user = userRepository.findById(userId).orElseThrow(() ->
@@ -63,17 +55,10 @@ public class ItemServiceImpl implements ItemService {
         item.setUserId(user.getId());
         item.setRequest(itemRequest);
         Item itemSaved = itemRepository.save(item);
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/items")
-                .build();
-        Logger.logSave(HttpMethod.POST, uriComponents.toUriString(), itemSaved.toString());
+        Logger.logSave(HttpMethod.POST, "/items", itemSaved.toString());
         return itemMapper.convertToDto(itemSaved);
     }
 
-    @Transactional
     @Override
     public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
         Item item = itemMapper.convertFromDto(itemDto);
@@ -95,18 +80,11 @@ public class ItemServiceImpl implements ItemService {
                 targetItem.setDescription(item.getDescription());
             }
             Item itemSaved = itemRepository.save(targetItem);
-            UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                    .scheme(protocol)
-                    .host(host)
-                    .port(port)
-                    .path("/items/{itemId}")
-                    .build();
-            Logger.logSave(HttpMethod.PATCH, uriComponents.toUriString(), itemSaved.toString());
+            Logger.logSave(HttpMethod.PATCH, "/items/" + itemId, itemSaved.toString());
             return itemMapper.convertToDto(itemSaved);
         }
     }
 
-    @Transactional(readOnly = true)
     @Override
     public ItemDto getItemById(long itemId, long userId) {
         userRepository.findById(userId).orElseThrow(() ->
@@ -128,17 +106,10 @@ public class ItemServiceImpl implements ItemService {
                 .map(commentMapper::convertToDto)
                 .collect(Collectors.toList());
         itemDto.setComments(commentsDto);
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/items/{itemId}")
-                .build();
-        Logger.logSave(HttpMethod.GET, uriComponents.toUriString(), itemDto.toString());
+        Logger.logSave(HttpMethod.GET, "/items/" + itemId, itemDto.toString());
         return itemDto;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<ItemDto> getAllItems(long userId, int from, int size) {
         User user = userRepository.findById(userId).orElseThrow(() ->
@@ -167,7 +138,6 @@ public class ItemServiceImpl implements ItemService {
         return itemsDto;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<ItemDto> searchItems(String text, int from, int size) {
         List<Item> items;
@@ -183,7 +153,6 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     @Override
     public void removeItem(long userId, long itemId) {
         userRepository.findById(userId).orElseThrow(() ->
@@ -191,16 +160,9 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new ObjectNotFoundException(String.format("Вещь с id %s не найдена", itemId)));
         itemRepository.deleteById(item.getId());
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/items/{itemId}")
-                .build();
-        Logger.logSave(HttpMethod.DELETE, uriComponents.toUriString(), "Вещь удалена");
+        Logger.logSave(HttpMethod.DELETE, "/items/" + itemId, "Вещь удалена");
     }
 
-    @Transactional
     @Override
     public CommentDto addComment(long userId, long itemId, CommentDto commentDto) {
         Comment comment = commentMapper.convertFromDto(commentDto);
@@ -219,13 +181,7 @@ public class ItemServiceImpl implements ItemService {
         comment.setItem(item);
         comment.setCreated(LocalDateTime.now());
         Comment commentSaved = commentRepository.save(comment);
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/items/{itemId}/comment")
-                .build();
-        Logger.logSave(HttpMethod.POST, uriComponents.toUriString(), commentSaved.toString());
+        Logger.logSave(HttpMethod.POST, "/items/" + itemId + "/comment", commentSaved.toString());
         return commentMapper.convertToDto(commentSaved);
     }
 

@@ -2,11 +2,8 @@ package ru.practicum.shareit.item.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -17,111 +14,65 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/items")
 @AllArgsConstructor
 public class ItemController {
     private final ItemService itemService;
-    private final String host = "localhost";
-    private final String port = "8080";
-    private final String protocol = "http";
-    private final String userIdHeader = "X-Sharer-User-Id";
 
     @PostMapping
-    public ResponseEntity<ItemDto> addItem(@RequestHeader(userIdHeader) long userId, @Valid @RequestBody ItemDto itemDto) {
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/items")
-                .build();
-        Logger.logRequest(HttpMethod.POST, uriComponents.toUriString(), itemDto.toString());
-        return ResponseEntity.status(200).body(itemService.addItem(userId, itemDto));
+    public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") long userId, @Valid @RequestBody ItemDto itemDto) {
+        Logger.logRequest(HttpMethod.POST, "/items", itemDto.toString());
+        return itemService.addItem(userId, itemDto);
     }
 
-    @GetMapping("{itemId}")
-    public ResponseEntity<ItemDto> getItem(@PathVariable long itemId, @RequestHeader(userIdHeader) long userId) {
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/items/{itemId}")
-                .build();
-        Logger.logRequest(HttpMethod.GET, uriComponents.toUriString(), "пусто");
-        return ResponseEntity.ok().body(itemService.getItemById(itemId, userId));
+    @PatchMapping("/{itemId}")
+    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId,
+                              @RequestBody ItemDto itemDto) {
+        Logger.logRequest(HttpMethod.PATCH, "/items/" + itemId, itemDto.toString());
+        return itemService.updateItem(userId, itemId, itemDto);
+    }
+
+    @GetMapping("/{itemId}")
+    public ItemDto getItem(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
+        Logger.logRequest(HttpMethod.GET, "/items/" + itemId, "пусто");
+        return itemService.getItemById(itemId, userId);
     }
 
     @GetMapping     // Просмотр владельцем списка всех его вещей с указанием названия и описания для каждой
-    public ResponseEntity<List<ItemDto>> getAllItems(@RequestHeader(userIdHeader) long userId,
-                                                     @RequestParam(defaultValue = "0")
-                                                     @PositiveOrZero(message = "Передаваемые параметры меньше нуля")
-                                                     int from,
-                                                     @RequestParam(defaultValue = "10", required = false)
-                                                         @Positive(message = "Значение size не должно быть отрицательным")
-                                                         int size) {
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/items")
-                .build();
-        Logger.logRequest(HttpMethod.GET, uriComponents.toUriString(), "пусто");
-        return ResponseEntity.ok().body(itemService.getAllItems(userId, from, size));
+    public List<ItemDto> getItemsByOwner(@RequestHeader("X-Sharer-User-Id") long userId,
+                                         @RequestParam(defaultValue = "0")
+                                         @PositiveOrZero(message = "Передаваемые параметры меньше нуля")
+                                         int from,
+                                         @RequestParam(defaultValue = "10", required = false)
+                                         @Positive(message = "Значение size не должно быть отрицательным")
+                                         int size) {
+        Logger.logRequest(HttpMethod.GET, "/items", "пусто");
+        return itemService.getAllItems(userId, from, size);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ItemDto>> searchItems(@RequestParam String text, @RequestParam(defaultValue = "0")
-    @PositiveOrZero(message = "Передаваемые параметры меньше нуля")
-    int from,
-                                                     @RequestParam(defaultValue = "10", required = false)
-                                                         @Positive(message = "Значение size не должно быть отрицательным")
-                                                         int size) {
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/items/")
-                .query("search?text={text}")
-                .build();
-        Logger.logRequest(HttpMethod.GET, uriComponents.toUriString(), "пусто");
-        return ResponseEntity.ok().body(itemService.searchItems(text, from, size));
-    }
-
-    @PatchMapping("{itemId}")
-    public ResponseEntity<ItemDto> updateItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId, @RequestBody ItemDto itemDto) {
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/items/{itemId}")
-                .build();
-        Logger.logRequest(HttpMethod.PATCH, uriComponents.toUriString(), itemDto.toString());
-        return ResponseEntity.ok().body(itemService.updateItem(userId, itemId, itemDto));
+    public List<ItemDto> searchItems(@RequestParam String text, @RequestParam(defaultValue = "0")
+                                     @PositiveOrZero(message = "Передаваемые параметры меньше нуля")
+                                     int from,
+                                     @RequestParam(defaultValue = "10", required = false)
+                                     @Positive(message = "Значение size не должно быть отрицательным")
+                                     int size) {
+        Logger.logRequest(HttpMethod.GET, "/items/search?text=" + text, "пусто");
+        return itemService.searchItems(text, from, size);
     }
 
     @DeleteMapping("{itemId}")
-    public ResponseEntity<Void> removeItem(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId) {
+    public void removeItem(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId) {
+        Logger.logRequest(HttpMethod.DELETE, "/items/" + itemId, "пусто");
         itemService.removeItem(userId, itemId);
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/items/{itemId}")
-                .build();
-        Logger.logRequest(HttpMethod.DELETE, uriComponents.toUriString(), "пусто");
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<CommentDto> addComment(@RequestHeader(userIdHeader) long userId, @PathVariable long itemId,
-                                 @RequestBody @Valid CommentDto commentDto) {
-        UriComponents uriComponents = UriComponentsBuilder.newInstance()
-                .scheme(protocol)
-                .host(host)
-                .port(port)
-                .path("/items/{itemId}/comment")
-                .build();
-        Logger.logRequest(HttpMethod.POST, uriComponents.toUriString(), commentDto.toString());
-        return ResponseEntity.ok().body(itemService.addComment(userId, itemId, commentDto));
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId,
+                              @RequestBody @Valid CommentDto commentDto) {
+        Logger.logRequest(HttpMethod.POST, "/items/" + itemId + "/comment", commentDto.toString());
+        return itemService.addComment(userId, itemId, commentDto);
     }
 }
