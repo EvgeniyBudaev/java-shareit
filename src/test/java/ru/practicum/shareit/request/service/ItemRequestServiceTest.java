@@ -31,6 +31,7 @@ class ItemRequestServiceTest {
     private ItemRequestService itemRequestService;
     private User user;
     private ItemRequestDto itemRequestDto;
+    @Mock
     private ItemMapper itemMapper;
 
     @BeforeEach
