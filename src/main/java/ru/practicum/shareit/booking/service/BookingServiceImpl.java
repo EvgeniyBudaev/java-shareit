@@ -42,19 +42,19 @@ public class BookingServiceImpl implements BookingService {
         }
         Item item = items.findById(bookingDto.getItemId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Предмета с id=" + bookingDto.getItemId() + " нет"));
+                        String.format("Предмета с id=%s нет", bookingDto.getItemId())));
         if (!item.getOwner().getId().equals(bookerId)) {
             if (item.getAvailable()) {
                 User user = users.findById(bookerId).orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                "Пользователя с id=" + bookerId + " нет"));
+                                String.format("Пользователя с id=%s нет", bookerId)));
                 Booking booking = mapper.mapToBookingFromBookingDto(bookingDto);
                 booking.setItem(item);
                 booking.setBooker(user);
                 return mapper.mapToBookingDtoResponse(bookings.save(booking));
             } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Вещь с id=" + item.getId()
-                        + " недоступна для бронирования");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        String.format("Вещь с id=%s недоступна для бронирования", item.getId()));
             }
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Владелец не может забронировать свою вещь");
@@ -69,7 +69,8 @@ public class BookingServiceImpl implements BookingService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Неккоректный параметр строки approved");
         }
         Booking booking = bookings.findById(bookingId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Бронирования с id=" + bookingId + " нет"));
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("Бронирования с id=%s нет", bookingId)));
         if (!booking.getStatus().equals(Status.WAITING)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Невозможно изменить статус брони со статусом " + booking.getStatus());
@@ -83,7 +84,7 @@ public class BookingServiceImpl implements BookingService {
             return mapper.mapToBookingDtoResponse(bookings.save(booking));
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Пользователь с id=" + ownerId + " не является владельцем вещи с id=" + booking.getItem().getOwner().getId());
+                    String.format("Пользователь с id=%s не является владельцем вещи с id=%s", ownerId, booking.getItem().getOwner().getId()));
         }
     }
 
@@ -93,8 +94,8 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookings.findById(bookingId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Бронирования с id=" + bookingId + " нет"));
         if (!(booking.getBooker().getId().equals(userId) || booking.getItem().getOwner().getId().equals(userId))) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь с id=" + userId
-                    + " не является автором бронирования или владельцем вещи, к которой относится бронирование");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    String.format("Пользователь с id=%s не является автором бронирования или владельцем вещи, к которой относится бронирование", userId));
         }
         return mapper.mapToBookingDtoResponse(booking);
     }
@@ -103,7 +104,8 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public BookingListDto getAllBookingsForUser(Pageable pageable, Long userId, String state) {
         if (!users.existsById(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " не существует");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    String.format("Пользователя с id=%s не существует", userId));
         } else {
             return getListBookings(pageable, state, userId, false);
         }
@@ -113,11 +115,11 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public BookingListDto getAllBookingsForItemsUser(Pageable pageable, Long userId, String state) {
         if (!users.existsById(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " не существует");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s не существует", userId));
         }
         if (!items.existsItemByOwnerId(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "У пользователя с id=" + userId + " нет зарегестрированых вещей");
+                    String.format("У пользователя с id=%s нет зарегестрированых вещей", userId));
         } else {
             return getListBookings(pageable, state, userId, true);
         }

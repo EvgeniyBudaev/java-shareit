@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDtoResponse getUserById(Long id) {
         return mapper.mapToUserDtoResponse(users.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + id + " нет"))
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s нет", id)))
         );
     }
 
@@ -47,14 +47,14 @@ public class UserServiceImpl implements UserService {
     @Transactional(propagation = Propagation.SUPPORTS)
     public UserDtoResponse updateUser(UserDtoUpdate user, Long userId) {
         User updatingUser = users.findById(userId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " нет"));
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s нет", userId)));
         return mapper.mapToUserDtoResponse(users.save(mapper.mapToUserFromUserDtoUpdate(user, updatingUser)));
     }
 
     @Override
     public void deleteUser(Long id) {
         if (!users.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + id + " нет");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s нет", id));
         }
         users.deleteById(id);
     }

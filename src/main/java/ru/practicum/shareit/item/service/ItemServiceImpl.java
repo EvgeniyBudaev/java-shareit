@@ -42,12 +42,13 @@ public class ItemServiceImpl implements ItemService {
         Item newItem = mapper.mapToItemFromItemDto(item);
         if (item.getRequestId() != null) {
             ItemRequest itemRequest = itemRequests.findById(item.getRequestId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Запроса с id=" +
-                            item.getRequestId() + " нет"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            String.format("Запроса с id=%s нет", item.getRequestId())));
+
             newItem.setRequest(itemRequest);
         }
         newItem.setOwner(users.findById(userId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " нет")));
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s нет", userId))));
         return mapper.mapToItemDtoResponse(items.save(newItem));
     }
 
@@ -55,10 +56,10 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public ItemDtoResponse updateItem(Long itemId, Long userId, ItemDtoUpdate item) {
         Item updateItem = items.findById(itemId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Предмета с id=" + itemId + " нет"));
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Предмета с id=%s нет", itemId)));
         if (!updateItem.getOwner().getId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Предмет с id=" + itemId + " пользователю с id=" + userId + " не пренадлежит");
+                    String.format("Предмет с id=%s пользователю с id=%s не пренадлежит", itemId, userId));
         }
         return mapper.mapToItemDtoResponse(items.save(mapper.mapToItemFromItemDtoUpdate(item, updateItem)));
     }
@@ -67,7 +68,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public ItemDtoResponse getItemByItemId(Long userId, Long itemId) {
         Item item = items.findById(itemId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Предмета с id=" + itemId + " нет"));
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Предмета с id=%s нет", itemId)));
         ItemDtoResponse itemDtoResponse = mapper.mapToItemDtoResponse(item);
         if (item.getOwner().getId().equals(userId)) {
             itemDtoResponse.setLastBooking(mapper
@@ -88,7 +89,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public ItemListDto getPersonalItems(Pageable pageable, Long userId) {
         if (!users.existsById(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " не существует");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s не существует", userId));
         }
         List<ItemDtoResponse> personalItems = items.findAllByOwnerId(pageable, userId).stream()
                 .map(mapper::mapToItemDtoResponse).collect(Collectors.toList());
@@ -119,13 +120,13 @@ public class ItemServiceImpl implements ItemService {
     public CommentDtoResponse addComment(Long itemId, Long userId, CommentDto commentDto) {
         if (!bookings.existsBookingByItemIdAndBookerIdAndStatusAndEndIsBefore(itemId, userId,
                 Status.APPROVED, LocalDateTime.now())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "У пользователя с id="
-                    + userId + " небыло ниодной брони на предмет с id=" + itemId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    String.format("У пользователя с id=%s небыло ниодной брони на предмет с id=%s", userId, itemId));
         } else {
             User author = users.findById(userId).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " нет"));
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Пользователя с id=%s нет", userId)));
             Item item = items.findById(itemId).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Предмета с id=" + itemId + " нет"));
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Предмета с id=%s нет", itemId)));
             Comment comment = mapper.mapToCommentFromCommentDto(commentDto);
             comment.setItem(item);
             comment.setAuthor(author);
