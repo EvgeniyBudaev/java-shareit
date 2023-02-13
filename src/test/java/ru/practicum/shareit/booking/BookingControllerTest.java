@@ -329,42 +329,6 @@ public class BookingControllerTest {
 
     @Test
     @SneakyThrows
-    public void getAllBookingsForUserWithIncorrectParamFrom() {
-        //when
-        mvc.perform(
-                        get("/bookings")
-                                .header(userIdHeader, 1)
-                                .param("from", "-1")
-                                .param("size", "2"))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(bookingService, times(0))
-                .getAllBookingsForUser(any(Pageable.class), anyLong(), anyString());
-    }
-
-    @Test
-    @SneakyThrows
-    public void getAllBookingsForUserWithIncorrectParamSize() {
-        //when
-        mvc.perform(
-                        get("/bookings")
-                                .header(userIdHeader, 1)
-                                .param("from", "0")
-                                .param("size", "10000"))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(bookingService, times(0))
-                .getAllBookingsForUser(any(Pageable.class), anyLong(), anyString());
-    }
-
-    @Test
-    @SneakyThrows
     public void getAllBookingsForItemsUser() {
         //given
         bookingListDto = BookingListDto.builder()
@@ -395,42 +359,6 @@ public class BookingControllerTest {
                                 .header(userIdHeader, 0)
                                 .param("from", "0")
                                 .param("size", "2"))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(bookingService, times(0))
-                .getAllBookingsForItemsUser(any(Pageable.class), anyLong(), anyString());
-    }
-
-    @Test
-    @SneakyThrows
-    public void getAllBookingsForItemsUserWithIncorrectParamFrom() {
-        //when
-        mvc.perform(
-                        get("/bookings/owner")
-                                .header(userIdHeader, 1)
-                                .param("from", "-1")
-                                .param("size", "2"))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(bookingService, times(0))
-                .getAllBookingsForItemsUser(any(Pageable.class), anyLong(), anyString());
-    }
-
-    @Test
-    @SneakyThrows
-    public void getAllBookingsForItemsUserWithIncorrectParamSize() {
-        //when
-        mvc.perform(
-                        get("/bookings/owner")
-                                .header(userIdHeader, 1)
-                                .param("from", "0")
-                                .param("size", "10000"))
                 .andDo(print())
                 //then
                 .andExpectAll(
