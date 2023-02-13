@@ -17,17 +17,17 @@ import javax.validation.ConstraintViolationException;
 public class ErrorHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
-    private ResponseEntity<String> handleException(ResponseStatusException e) {
+    private ResponseEntity<String> handleException(ResponseStatusException exception) {
         return ResponseEntity
-                .status(e.getStatus())
-                .body(e.getMessage());
+                .status(exception.getStatus())
+                .body(exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    private ResponseEntity<String> handleException(MethodArgumentNotValidException e) {
+    private ResponseEntity<String> handleException(MethodArgumentNotValidException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(HttpStatus.BAD_REQUEST + " " + e.getFieldError().getDefaultMessage());
+                .body(HttpStatus.BAD_REQUEST + " " + exception.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -38,16 +38,16 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler(StateException.class)
-    private ResponseEntity<StateErrorResponse> handleException(StateException e) {
+    private ResponseEntity<StateErrorResponse> handleException(StateException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(new StateErrorResponse(e.getMessage()));
+                .body(new StateErrorResponse(exception.getMessage()));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    private ResponseEntity<String> handleException(ConstraintViolationException e) {
+    private ResponseEntity<String> handleException(ConstraintViolationException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(HttpStatus.BAD_REQUEST + " " + e.getMessage());
+                .body(HttpStatus.BAD_REQUEST + " " + exception.getMessage());
     }
 }
