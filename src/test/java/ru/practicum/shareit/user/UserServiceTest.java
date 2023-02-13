@@ -164,7 +164,7 @@ public class UserServiceTest {
                 //when
                 () -> userService.deleteUser(1L)
         )
-        //then
+                //then
                 .isInstanceOf(ResponseStatusException.class);
     }
 }

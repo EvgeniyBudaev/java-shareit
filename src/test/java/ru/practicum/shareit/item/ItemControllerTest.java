@@ -265,8 +265,8 @@ public class ItemControllerTest {
         //when
         when(itemService.getItemByItemId(anyLong(), anyLong())).thenReturn(itemDtoResponse);
         mvc.perform(
-                get("/items/1")
-                        .header(userIdHeader, 1))
+                        get("/items/1")
+                                .header(userIdHeader, 1))
                 .andDo(print())
                 //then
                 .andExpectAll(
@@ -313,10 +313,10 @@ public class ItemControllerTest {
         //when
         when(itemService.getPersonalItems(any(Pageable.class), anyLong())).thenReturn(itemListDto);
         mvc.perform(
-                get("/items")
-                        .param("from","0")
-                        .param("size","1")
-                        .header("X-Sharer-User-Id", 1))
+                        get("/items")
+                                .param("from", "0")
+                                .param("size", "1")
+                                .header("X-Sharer-User-Id", 1))
                 .andExpectAll(
                         status().isOk(),
                         content().json(objectMapper.writeValueAsString(itemListDto))
@@ -329,8 +329,8 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         get("/items")
-                                .param("from","0")
-                                .param("size","1")
+                                .param("from", "0")
+                                .param("size", "1")
                                 .header(userIdHeader, 0))
                 .andExpectAll(
                         status().isBadRequest()
@@ -344,8 +344,8 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         get("/items")
-                                .param("from","-1")
-                                .param("size","1")
+                                .param("from", "-1")
+                                .param("size", "1")
                                 .header(userIdHeader, 1))
                 .andExpectAll(
                         status().isBadRequest()
@@ -359,8 +359,8 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         get("/items")
-                                .param("from","0")
-                                .param("size","99999")
+                                .param("from", "0")
+                                .param("size", "99999")
                                 .header(userIdHeader, 1))
                 .andExpectAll(
                         status().isBadRequest()
@@ -377,8 +377,8 @@ public class ItemControllerTest {
         when(itemService.getFoundItems(any(Pageable.class), anyString())).thenReturn(itemListDto);
         mvc.perform(
                         get("/items/search")
-                                .param("from","0")
-                                .param("size","1")
+                                .param("from", "0")
+                                .param("size", "1")
                                 .param("text", "description"))
                 .andExpectAll(
                         status().isOk(),
@@ -392,13 +392,13 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         get("/items/search")
-                                .param("from","-1")
-                                .param("size","1")
+                                .param("from", "-1")
+                                .param("size", "1")
                                 .param("text", "description"))
                 .andExpectAll(
                         status().isBadRequest()
                 );
-        verify(itemService,times(0)).getFoundItems(any(Pageable.class), anyString());
+        verify(itemService, times(0)).getFoundItems(any(Pageable.class), anyString());
     }
 
     @SneakyThrows
@@ -407,13 +407,13 @@ public class ItemControllerTest {
         //when
         mvc.perform(
                         get("/items/search")
-                                .param("from","0")
-                                .param("size","0")
+                                .param("from", "0")
+                                .param("size", "0")
                                 .param("text", "description"))
                 .andExpectAll(
                         status().isBadRequest()
                 );
-        verify(itemService,times(0)).getFoundItems(any(Pageable.class), anyString());
+        verify(itemService, times(0)).getFoundItems(any(Pageable.class), anyString());
     }
 
     @SneakyThrows
@@ -432,10 +432,10 @@ public class ItemControllerTest {
         //when
         when(itemService.addComment(anyLong(), anyLong(), any(CommentDto.class))).thenReturn(commentDtoResponse);
         mvc.perform(
-                post("/items/1/comment")
-                        .header(userIdHeader, 1)
-                        .content(objectMapper.writeValueAsString(comment))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        post("/items/1/comment")
+                                .header(userIdHeader, 1)
+                                .content(objectMapper.writeValueAsString(comment))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 //then
                 .andExpectAll(

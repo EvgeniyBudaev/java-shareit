@@ -77,16 +77,16 @@ public class BookingControllerTest {
         //when
         when(bookingService.createBooking(anyLong(), any(BookingDto.class))).thenReturn(bookingDtoResponse);
         mvc.perform(
-                post("/bookings")
-                        .content(objectMapper.writeValueAsString(bookingDto))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(userIdHeader, 1))
+                        post("/bookings")
+                                .content(objectMapper.writeValueAsString(bookingDto))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(userIdHeader, 1))
                 .andDo(print())
                 //then
                 .andExpectAll(
                         status().isCreated(),
                         content().json(objectMapper.writeValueAsString(bookingDtoResponse))
-        );
+                );
     }
 
     @Test
@@ -174,9 +174,9 @@ public class BookingControllerTest {
         //when
         when(bookingService.approveBooking(anyLong(), anyLong(), anyString())).thenReturn(bookingDtoResponse);
         mvc.perform(
-                (patch("/bookings/1"))
-                        .header(userIdHeader, 1)
-                        .param("approved", "true"))
+                        (patch("/bookings/1"))
+                                .header(userIdHeader, 1)
+                                .param("approved", "true"))
                 .andDo(print())
                 //then
                 .andExpectAll(
@@ -224,8 +224,8 @@ public class BookingControllerTest {
         //when
         when(bookingService.getBookingByIdForOwnerAndBooker(anyLong(), anyLong())).thenReturn(bookingDtoResponse);
         mvc.perform(
-                get("/bookings/1")
-                        .header(userIdHeader, 1))
+                        get("/bookings/1")
+                                .header(userIdHeader, 1))
                 .andDo(print())
                 //then
                 .andExpectAll(
@@ -274,10 +274,10 @@ public class BookingControllerTest {
         when(bookingService.getAllBookingsForUser(any(Pageable.class), anyLong(), anyString()))
                 .thenReturn(bookingListDto);
         mvc.perform(
-                get("/bookings")
-                        .header(userIdHeader, 1)
-                        .param("from", "0")
-                        .param("size", "2"))
+                        get("/bookings")
+                                .header(userIdHeader, 1)
+                                .param("from", "0")
+                                .param("size", "2"))
                 .andDo(print())
                 //then
                 .andExpectAll(

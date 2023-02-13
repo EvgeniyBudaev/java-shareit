@@ -219,7 +219,7 @@ public class ItemServiceTest {
         var personalItemsList = itemService.getPersonalItems(PageRequest.of(0, 2), user1.getId());
         //then
         assertThat(personalItemsList.getItems()).singleElement().usingRecursiveComparison()
-                        .ignoringFields("comments").isEqualTo(findItem);
+                .ignoringFields("comments").isEqualTo(findItem);
     }
 
     @Test
