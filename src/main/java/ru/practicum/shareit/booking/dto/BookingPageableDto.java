@@ -10,11 +10,12 @@ public class BookingPageableDto extends PageRequest {
     @Min(0)
     private final Integer from;
 
-    @Min(1) @Max(20)
+    @Min(1)
+    @Max(20)
     private final Integer size;
 
     protected BookingPageableDto(Integer from, Integer size) {
-        super(from/size, size, Sort.unsorted());
+        super(from / size, size, Sort.unsorted());
         this.from = from;
         this.size = size;
     }
