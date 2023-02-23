@@ -1,23 +1,16 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
-@EqualsAndHashCode
 @Entity
 @Table(name = "comments")
 public class Comment {
@@ -35,4 +28,17 @@ public class Comment {
     private User author;
     @Column
     private LocalDateTime created;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Comment comment = (Comment) o;
+        return id != null && Objects.equals(id, comment.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

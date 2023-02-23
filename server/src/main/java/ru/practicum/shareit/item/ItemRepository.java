@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.repository;
+package ru.practicum.shareit.item;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
