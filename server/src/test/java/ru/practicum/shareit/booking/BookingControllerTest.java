@@ -3,7 +3,7 @@ package ru.practicum.shareit.booking;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
@@ -45,8 +45,8 @@ public class BookingControllerTest {
     private BookingListDto bookingListDto;
     private static BookingDtoResponse bookingDtoResponse;
 
-    @BeforeAll
-    public static void setUp() {
+    @BeforeEach
+    public void setUp() {
         bookingDto = BookingDto.builder()
                 .start(LocalDateTime.now().plusDays(1))
                 .end(LocalDateTime.now().plusDays(2))

@@ -2,7 +2,7 @@ package ru.practicum.shareit.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
@@ -39,8 +39,8 @@ public class UserControllerTest {
     private static UserDto userDto;
     private static UserDtoUpdate userDtoUpdate;
 
-    @BeforeAll
-    public static void setUp() {
+    @BeforeEach
+    public void setUp() {
         userDtoResponse = UserDtoResponse.builder()
                 .id(1L)
                 .name("test name")
