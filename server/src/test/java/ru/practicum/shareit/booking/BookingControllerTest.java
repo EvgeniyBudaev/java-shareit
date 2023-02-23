@@ -23,6 +23,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.dto.BookingListDto;
 import ru.practicum.shareit.booking.enums.Status;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.handler.exception.StateException;
 import ru.practicum.shareit.item.dto.ItemShortDto;
 import ru.practicum.shareit.user.dto.UserShortDto;
