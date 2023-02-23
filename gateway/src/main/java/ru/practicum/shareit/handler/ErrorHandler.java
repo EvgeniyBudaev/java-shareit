@@ -11,7 +11,6 @@ import ru.practicum.shareit.handler.responce.StateErrorResponse;
 
 import javax.validation.ConstraintViolationException;
 
-
 @RestControllerAdvice("ru.practicum.shareit")
 public class ErrorHandler {
 

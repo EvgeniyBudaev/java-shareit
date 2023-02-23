@@ -9,7 +9,6 @@ import ru.practicum.shareit.client.BaseWebClient;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserDtoUpdate;
 
-
 @Service
 public class UserClient extends BaseWebClient {
     private static final String API_PREFIX = "/users";
