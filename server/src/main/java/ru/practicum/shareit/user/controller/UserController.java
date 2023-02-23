@@ -11,6 +11,9 @@ import ru.practicum.shareit.user.dto.UserDtoResponse;
 import ru.practicum.shareit.user.dto.UserDtoUpdate;
 import ru.practicum.shareit.user.dto.UserListDto;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+
 /**
  * TODO Sprint add-controllers.
  */
@@ -21,12 +24,12 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDtoResponse> createUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDtoResponse> createUser(@Valid @RequestBody UserDto userDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userDto));
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<UserDtoResponse> getUserById(@PathVariable("id") Long userId) {
+    public ResponseEntity<UserDtoResponse> getUserById(@PathVariable("id") @Min(1) Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(userId));
     }
 
@@ -42,7 +45,7 @@ public class UserController {
     }
 
     @DeleteMapping("{id}")
-    public void deleteUser(@PathVariable("id") Long userId) {
+    public void deleteUser(@Min(1) @PathVariable("id") Long userId) {
         userService.deleteUser(userId);
     }
 
