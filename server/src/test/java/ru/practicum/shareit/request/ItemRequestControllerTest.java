@@ -12,16 +12,27 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.request.dto.*;
+import ru.practicum.shareit.request.dto.ItemDataForRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestDtoResponse;
+import ru.practicum.shareit.request.dto.ItemRequestListDto;
+import ru.practicum.shareit.request.dto.RequestDtoResponseWithMD;
+import ru.practicum.shareit.request.service.ItemRequestService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -36,6 +47,7 @@ public class ItemRequestControllerTest {
     private ItemRequestListDto itemRequestListDto;
     private RequestDtoResponseWithMD requestDtoResponseWithMD;
     private ItemDataForRequestDto itemDataForRequestDto;
+    private final String userIdHeader = "X-Sharer-User-Id";
 
     @BeforeEach
     public void setUp() {
@@ -69,7 +81,7 @@ public class ItemRequestControllerTest {
                 .thenReturn(itemRequestDtoResponse);
         mvc.perform(
                         post("/requests")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .content(objectMapper.writeValueAsString(itemRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())
@@ -78,6 +90,42 @@ public class ItemRequestControllerTest {
                         status().isOk(),
                         content().json(objectMapper.writeValueAsString(itemRequestDtoResponse))
                 );
+    }
+
+    @Test
+    @SneakyThrows
+    public void createRequestWitchIncorrectUserId() {
+        //when
+        mvc.perform(
+                        post("/requests")
+                                .header(userIdHeader, 0)
+                                .content(objectMapper.writeValueAsString(itemRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                //then
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+        verify(itemRequestService, times(0)).createItemRequest(any(ItemRequestDto.class), anyLong());
+    }
+
+    @Test
+    @SneakyThrows
+    public void createRequestWhenIncorrectDescription() {
+        //given
+        itemRequestDto.setDescription(" ");
+        //when
+        mvc.perform(
+                        post("/requests")
+                                .header(userIdHeader, 0)
+                                .content(objectMapper.writeValueAsString(itemRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                //then
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+        verify(itemRequestService, times(0)).createItemRequest(any(ItemRequestDto.class), anyLong());
     }
 
     @Test
@@ -92,7 +140,7 @@ public class ItemRequestControllerTest {
         when(itemRequestService.getPrivateRequests(any(PageRequest.class), anyLong())).thenReturn(itemRequestListDto);
         mvc.perform(
                         get("/requests")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "0")
                                 .param("size", "2")
                 ).andDo(print())
@@ -100,6 +148,54 @@ public class ItemRequestControllerTest {
                         status().isOk(),
                         content().json(objectMapper.writeValueAsString(itemRequestListDto))
                 );
+    }
+
+    @Test
+    @SneakyThrows
+    public void getPrivateRequestsWithIncorrectUserId() {
+        //when
+        mvc.perform(
+                        get("/requests")
+                                .header(userIdHeader, 0)
+                                .param("from", "0")
+                                .param("size", "2")
+                ).andDo(print())
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+        verify(itemRequestService, times(0)).getPrivateRequests(any(PageRequest.class), anyLong());
+    }
+
+    @Test
+    @SneakyThrows
+    public void getPrivateRequestsWithIncorrectParamFrom() {
+        //when
+        mvc.perform(
+                        get("/requests")
+                                .header(userIdHeader, 1)
+                                .param("from", "-1")
+                                .param("size", "2")
+                ).andDo(print())
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+        verify(itemRequestService, times(0)).getPrivateRequests(any(PageRequest.class), anyLong());
+    }
+
+    @Test
+    @SneakyThrows
+    public void getPrivateRequestsWithIncorrectParamSize() {
+        //when
+        mvc.perform(
+                        get("/requests")
+                                .header(userIdHeader, 1)
+                                .param("from", "0")
+                                .param("size", "-1")
+                ).andDo(print())
+                .andExpectAll(
+                        status().isBadRequest()
+                );
+        verify(itemRequestService, times(0)).getPrivateRequests(any(PageRequest.class), anyLong());
     }
 
     @Test
@@ -114,7 +210,7 @@ public class ItemRequestControllerTest {
         when(itemRequestService.getOtherRequests(any(PageRequest.class), anyLong())).thenReturn(itemRequestListDto);
         mvc.perform(
                         get("/requests/all")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                                 .param("from", "0")
                                 .param("size", "2")
                 ).andDo(print())
@@ -126,6 +222,57 @@ public class ItemRequestControllerTest {
 
     @Test
     @SneakyThrows
+    public void getOtherRequestsWitchIncorrectUserId() {
+        //when
+        mvc.perform(
+                        get("/requests/all")
+                                .header(userIdHeader, 0)
+                                .param("from", "0")
+                                .param("size", "2")
+                ).andDo(print())
+                .andExpectAll(
+                        //then
+                        status().isBadRequest()
+                );
+        verify(itemRequestService, times(0)).getOtherRequests(any(PageRequest.class), anyLong());
+    }
+
+    @Test
+    @SneakyThrows
+    public void getOtherRequestsWitchIncorrectParamFrom() {
+        //when
+        mvc.perform(
+                        get("/requests/all")
+                                .header(userIdHeader, 1)
+                                .param("from", "-1")
+                                .param("size", "2")
+                ).andDo(print())
+                .andExpectAll(
+                        //then
+                        status().isBadRequest()
+                );
+        verify(itemRequestService, times(0)).getOtherRequests(any(PageRequest.class), anyLong());
+    }
+
+    @Test
+    @SneakyThrows
+    public void getOtherRequestsWitchIncorrectParamSize() {
+        //when
+        mvc.perform(
+                        get("/requests/all")
+                                .header(userIdHeader, 1)
+                                .param("from", "0")
+                                .param("size", "24343")
+                ).andDo(print())
+                .andExpectAll(
+                        //then
+                        status().isBadRequest()
+                );
+        verify(itemRequestService, times(0)).getOtherRequests(any(PageRequest.class), anyLong());
+    }
+
+    @Test
+    @SneakyThrows
     public void getItemRequest() {
         //given
         requestDtoResponseWithMD.setItems(Set.of(itemDataForRequestDto));
@@ -133,7 +280,7 @@ public class ItemRequestControllerTest {
         when(itemRequestService.getItemRequest(anyLong(), anyLong())).thenReturn(requestDtoResponseWithMD);
         mvc.perform(
                         get("/requests/1")
-                                .header("X-Sharer-User-Id", 1)
+                                .header(userIdHeader, 1)
                 ).andDo(print())
                 .andExpectAll(
                         status().isOk(),
@@ -141,4 +288,33 @@ public class ItemRequestControllerTest {
                 );
     }
 
+    @Test
+    @SneakyThrows
+    public void getItemRequestWitchIncorrectUserId() {
+        //when
+        mvc.perform(
+                        get("/requests/1")
+                                .header(userIdHeader, 0)
+                ).andDo(print())
+                .andExpectAll(
+                        //then
+                        status().isBadRequest()
+                );
+        verify(itemRequestService, times(0)).getItemRequest(anyLong(), anyLong());
+    }
+
+    @Test
+    @SneakyThrows
+    public void getItemRequestWitchIncorrectItemRequestId() {
+        //when
+        mvc.perform(
+                        get("/requests/0")
+                                .header(userIdHeader, 1)
+                ).andDo(print())
+                .andExpectAll(
+                        //then
+                        status().isBadRequest()
+                );
+        verify(itemRequestService, times(0)).getItemRequest(anyLong(), anyLong());
+    }
 }

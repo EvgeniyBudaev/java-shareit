@@ -1,7 +1,7 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -14,8 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserDtoUpdate;
+import ru.practicum.shareit.user.service.UserService;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
@@ -28,8 +30,8 @@ public class UserServiceTest {
     private static UserDto user2;
     private static UserDtoUpdate updateUser1;
 
-    @BeforeAll
-    public static void setUp() {
+    @BeforeEach
+    public void setUp() {
         user1 = UserDto.builder()
                 .name("test name")
                 .email("test@test.ru")
@@ -163,7 +165,7 @@ public class UserServiceTest {
                 //when
                 () -> userService.deleteUser(1L)
         )
-        //then
+                //then
                 .isInstanceOf(ResponseStatusException.class);
     }
 }
