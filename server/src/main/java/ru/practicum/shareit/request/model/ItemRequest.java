@@ -12,9 +12,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @Getter
 @Setter
 @RequiredArgsConstructor
