@@ -1,7 +1,8 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.repository;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Item;
 

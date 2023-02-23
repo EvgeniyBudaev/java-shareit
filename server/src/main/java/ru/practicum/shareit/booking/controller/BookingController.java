@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,28 +6,27 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.dto.BookingListDto;
 
-/**
- * TODO Sprint add-bookings.
- */
 @RestController
 @RequestMapping("/bookings")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BookingController {
 
     private final BookingService bookingService;
+    private final String userIdHeader = "X-Sharer-User-Id";
 
     @PostMapping
-    public ResponseEntity<BookingDtoResponse> createBooking(@RequestHeader("X-Sharer-User-Id") Long bookerId,
+    public ResponseEntity<BookingDtoResponse> createBooking(@RequestHeader(userIdHeader) Long bookerId,
                                                             @RequestBody BookingDto bookingDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.createBooking(bookerId, bookingDto));
     }
 
     @PatchMapping("{bookingId}")
-    public ResponseEntity<BookingDtoResponse> approveBooking(@RequestHeader("X-Sharer-User-Id") Long ownerId,
+    public ResponseEntity<BookingDtoResponse> approveBooking(@RequestHeader(userIdHeader) Long ownerId,
                                                              @RequestParam String approved,
                                                              @PathVariable Long bookingId) {
         return ResponseEntity.status(HttpStatus.OK).body(bookingService.approveBooking(ownerId, bookingId, approved));
@@ -36,14 +35,14 @@ public class BookingController {
     @GetMapping("{bookingId}")
     public ResponseEntity<BookingDtoResponse> getBookingByIdForOwnerAndBooker(
             @PathVariable Long bookingId,
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
+            @RequestHeader(userIdHeader) Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(bookingService.getBookingByIdForOwnerAndBooker(bookingId, userId));
     }
 
     @GetMapping
     public ResponseEntity<BookingListDto> getAllBookingsForUser(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(userIdHeader) Long userId,
             @RequestParam(defaultValue = "ALL") String state,
             @RequestParam(value = "from", defaultValue = "0") Integer from,
             @RequestParam(value = "size", defaultValue = "10") Integer size) {
@@ -53,7 +52,7 @@ public class BookingController {
 
     @GetMapping("owner")
     public ResponseEntity<BookingListDto> getAllBookingsForItemsUser(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(userIdHeader) Long userId,
             @RequestParam(defaultValue = "ALL") String state,
             @RequestParam(value = "from", defaultValue = "0") Integer from,
             @RequestParam(value = "size", defaultValue = "10") Integer size) {
