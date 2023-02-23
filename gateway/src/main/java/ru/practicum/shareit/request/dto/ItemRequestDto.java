@@ -7,6 +7,9 @@ import lombok.extern.jackson.Jacksonized;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+/**
+ * TODO Sprint add-item-requests.
+ */
 @Builder
 @Data
 @Jacksonized

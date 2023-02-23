@@ -6,9 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import ru.practicum.shareit.client.BaseWebClient;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoUpdate;
+import ru.practicum.shareit.item.dto.*;
 
 import java.util.Map;
 

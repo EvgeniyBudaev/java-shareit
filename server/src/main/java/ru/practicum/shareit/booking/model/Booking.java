@@ -1,28 +1,22 @@
 package ru.practicum.shareit.booking.model;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import ru.practicum.shareit.booking.enums.Status;
+import org.hibernate.Hibernate;
+import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
+/**
+ * TODO Sprint add-bookings.
+ */
 @Getter
 @Setter
-@EqualsAndHashCode
 @Entity
 @RequiredArgsConstructor
 @Table(name = "bookings")
@@ -43,4 +37,17 @@ public class Booking {
     private User booker;
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Booking booking = (Booking) o;
+        return id != null && Objects.equals(id, booking.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
