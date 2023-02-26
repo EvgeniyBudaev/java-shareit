@@ -5,6 +5,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
+import ru.practicum.shareit.common.Header;
 
 import java.time.Duration;
 import java.util.List;
@@ -66,7 +67,7 @@ public class BaseWebClient {
     private <T> Mono<ResponseEntity<Object>> makeAndSendRequest(HttpMethod method, String path, Long userId,
                                                                 @Nullable Map<String, Object> parameters, @Nullable T body) {
         if (method.equals(HttpMethod.POST) || method.equals(HttpMethod.PATCH)) {
-            if (parameters == null) {
+            if (parameters == null & body != null) {
                 Mono<Object> monoBody = Mono.just(body);
                 return webClient
                         .method(method)
@@ -78,7 +79,7 @@ public class BaseWebClient {
                                 .flatMap(error -> Mono.error(new ResponseStatusException(response.statusCode(), error))))
                         .toEntity(Object.class)
                         .timeout(Duration.ofMinutes(1));
-            } else {
+            } else if (parameters != null) {
                 return webClient
                         .method(method)
                         .uri(path, parameters)
@@ -118,7 +119,7 @@ public class BaseWebClient {
             httpHeaders.setContentType(MediaType.APPLICATION_JSON);
             httpHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
             if (userId != null) {
-                httpHeaders.set("X-Sharer-User-Id", String.valueOf(userId));
+                httpHeaders.set(Header.userIdHeader, String.valueOf(userId));
             }
         };
     }
