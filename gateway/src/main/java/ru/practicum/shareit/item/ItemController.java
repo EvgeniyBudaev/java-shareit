@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import ru.practicum.shareit.common.Header;
 import ru.practicum.shareit.item.dto.*;
 
 import javax.validation.Valid;
@@ -20,27 +21,27 @@ public class ItemController {
     private final ItemClient itemClient;
 
     @PostMapping
-    public Mono<ResponseEntity<Object>> createItem(@RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+    public Mono<ResponseEntity<Object>> createItem(@RequestHeader(Header.userIdHeader) @Min(1) Long userId,
                                                    @Valid @RequestBody ItemDto itemDto) {
         return itemClient.createItem(userId, itemDto);
     }
 
     @PatchMapping("{itemId}")
-    public Mono<ResponseEntity<Object>> updateItem(@RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+    public Mono<ResponseEntity<Object>> updateItem(@RequestHeader(Header.userIdHeader) @Min(1) Long userId,
                                                    @RequestBody ItemDtoUpdate itemDtoUpdate,
                                                    @PathVariable @Min(1) Long itemId) {
         return itemClient.updateItem(userId, itemDtoUpdate, itemId);
     }
 
     @GetMapping("{itemId}")
-    public Mono<ResponseEntity<Object>> getItemByItemId(@RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+    public Mono<ResponseEntity<Object>> getItemByItemId(@RequestHeader(Header.userIdHeader) @Min(1) Long userId,
                                                         @PathVariable @Min(1) Long itemId) {
         return itemClient.getItemByItemId(userId, itemId);
     }
 
     @GetMapping
     public Mono<ResponseEntity<Object>> getPersonalItems(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+            @RequestHeader(Header.userIdHeader) @Min(1) Long userId,
             @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {
         return itemClient.getPersonalItems(userId, from, size);
@@ -48,7 +49,7 @@ public class ItemController {
 
     @GetMapping("search")
     public Mono<ResponseEntity<Object>> getFoundItems(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+            @RequestHeader(Header.userIdHeader) @Min(1) Long userId,
             @RequestParam String text,
             @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {
@@ -57,7 +58,7 @@ public class ItemController {
 
     @PostMapping("{itemId}/comment")
     public Mono<ResponseEntity<Object>> addComment(@PathVariable @Min(1) Long itemId,
-                                                   @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+                                                   @RequestHeader(Header.userIdHeader) @Min(1) Long userId,
                                                    @Valid @RequestBody CommentDto commentDto) {
         return itemClient.addComment(itemId, userId, commentDto);
     }
