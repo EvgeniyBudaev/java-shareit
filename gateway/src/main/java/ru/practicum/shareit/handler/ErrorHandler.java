@@ -10,13 +10,14 @@ import ru.practicum.shareit.handler.exception.StateException;
 import ru.practicum.shareit.handler.responce.StateErrorResponse;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Objects;
 
 @RestControllerAdvice("ru.practicum.shareit")
 public class ErrorHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
     private ResponseEntity<String> handleException(ResponseStatusException e) {
-        String message = e.getMessage().replace(HttpStatus.BAD_REQUEST.toString(), "");
+        String message = Objects.requireNonNull(e.getMessage()).replace(HttpStatus.BAD_REQUEST.toString(), "");
         return ResponseEntity
                 .status(e.getStatus())
                 .body(message);
@@ -26,7 +27,7 @@ public class ErrorHandler {
     private ResponseEntity<String> handleException(MethodArgumentNotValidException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(HttpStatus.BAD_REQUEST + " " + e.getFieldError().getDefaultMessage());
+                .body(HttpStatus.BAD_REQUEST + " " + Objects.requireNonNull(e.getFieldError()).getDefaultMessage());
     }
 
 
