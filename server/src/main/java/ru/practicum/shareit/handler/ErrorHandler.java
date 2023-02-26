@@ -18,18 +18,18 @@ import java.util.Objects;
 public class ErrorHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
-    private ResponseEntity<String> handleException(ResponseStatusException e) {
-        String message = Objects.requireNonNull(e.getMessage()).replace(e.getStatus().toString(), "");
+    private ResponseEntity<String> handleException(ResponseStatusException exception) {
+        String message = Objects.requireNonNull(exception.getMessage()).replace(exception.getStatus().toString(), "");
         return ResponseEntity
-                .status(e.getStatus())
+                .status(exception.getStatus())
                 .body(message);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    private ResponseEntity<String> handleException(MethodArgumentNotValidException e) {
+    private ResponseEntity<String> handleException(MethodArgumentNotValidException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(Objects.requireNonNull(e.getFieldError()).getDefaultMessage());
+                .body(Objects.requireNonNull(exception.getFieldError()).getDefaultMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -40,16 +40,16 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler(StateException.class)
-    private ResponseEntity<StateErrorResponse> handleException(StateException e) {
+    private ResponseEntity<StateErrorResponse> handleException(StateException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(new StateErrorResponse(e.getMessage()));
+                .body(new StateErrorResponse(exception.getMessage()));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    private ResponseEntity<String> handleException(ConstraintViolationException e) {
+    private ResponseEntity<String> handleException(ConstraintViolationException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(HttpStatus.BAD_REQUEST + " " + e.getMessage());
+                .body(HttpStatus.BAD_REQUEST + " " + exception.getMessage());
     }
 }
